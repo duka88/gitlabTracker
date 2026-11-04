@@ -37,6 +37,7 @@ pub fn tab(id: &str, name: &str, kind: ListKind) -> Tab {
         notify_new_items: true,
         notify_new_comments: true,
         notify_changes: true,
+        test_branch: None,
     }
 }
 
@@ -78,6 +79,10 @@ pub fn mr(n: u32) -> ListItem {
                 given: 0,
             },
             unresolved_threads: 0,
+            source_branch: String::new(),
+            head_sha: String::new(),
+            on_branch: None,
+            ticket: None,
             reviewers: vec![],
             merge_status: None,
         }),

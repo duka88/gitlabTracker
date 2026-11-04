@@ -18,6 +18,7 @@ export const api = {
   removeToken: () => invoke<void>("remove_token"),
   setInterval: (minutes: 1 | 2 | 5 | 10) => invoke<void>("set_interval", { minutes }),
   setNotifyMentions: (enabled: boolean) => invoke<void>("set_notify_mentions", { enabled }),
+  setTestBranch: (branch: string | null) => invoke<void>("set_test_branch", { branch }),
   validateUrl: (url: string) => invoke<UrlCheck>("validate_url", { url }),
   saveTabs: (tabs: Tab[]) => invoke<Tab[]>("save_tabs", { tabs }),
   resetDefaultTabs: () => invoke<Tab[]>("reset_default_tabs"),

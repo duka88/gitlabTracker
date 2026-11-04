@@ -12,6 +12,26 @@ import TabEditor from "./TabEditor.vue";
 const { state, closeSettings, quit, hide } = useAppState();
 const mentionError = ref<string | null>(null);
 
+// FR-037: branch flagged on every MR.
+const testBranch = ref(state.view?.testBranch ?? "");
+const branchError = ref<string | null>(null);
+const branchSaved = ref(false);
+async function saveTestBranch() {
+  branchError.value = null;
+  branchSaved.value = false;
+  const b = testBranch.value.trim();
+  if (/\s/.test(b)) {
+    branchError.value = "A branch name can't contain spaces";
+    return;
+  }
+  try {
+    await api.setTestBranch(b || null);
+    branchSaved.value = true;
+  } catch (err) {
+    branchError.value = (err as { message?: string })?.message ?? String(err);
+  }
+}
+
 async function setMentions(e: Event) {
   mentionError.value = null;
   try {
@@ -46,6 +66,17 @@ async function setMentions(e: Event) {
           Notify when I'm mentioned
         </label>
         <p v-if="mentionError" class="err" role="alert">{{ mentionError }}</p>
+      </section>
+      <section class="card">
+        <h2>Test branch</h2>
+        <p class="muted small">Every MR merged into this branch is flagged "on &lt;branch&gt;" in all MR tabs.</p>
+        <form class="row" @submit.prevent="saveTestBranch">
+          <label class="sr-only" for="test-branch">Test branch</label>
+          <input id="test-branch" v-model="testBranch" type="text" spellcheck="false" placeholder="e.g. resource-test (empty = off)" @input="branchSaved = false" />
+          <button type="submit">Save</button>
+        </form>
+        <p v-if="branchSaved" class="saved small">Saved</p>
+        <p v-if="branchError" class="err" role="alert">{{ branchError }}</p>
       </section>
       <TabEditor />
     </div>
@@ -87,6 +118,13 @@ h1 {
   overscroll-behavior: contain;
   overflow-y: auto;
   user-select: text;
+}
+.small {
+  font-size: var(--fs-sm);
+}
+.saved {
+  color: var(--green);
+  margin: 6px 0 0;
 }
 .mention {
   margin-top: 10px;

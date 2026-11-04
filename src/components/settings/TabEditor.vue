@@ -15,6 +15,7 @@ interface Draft {
   notifyNewItems: boolean;
   notifyNewComments: boolean;
   notifyChanges: boolean;
+  testBranch: string;
   check: UrlCheck | null;
   checking: boolean;
   confirmDelete: boolean;
@@ -31,7 +32,7 @@ let nextKey = 1;
 const timers = new Map<number, ReturnType<typeof setTimeout>>();
 
 function toDraft(t: Tab): Draft {
-  return { key: nextKey++, ...t, check: null, checking: false, confirmDelete: false };
+  return { key: nextKey++, ...t, testBranch: t.testBranch ?? "", check: null, checking: false, confirmDelete: false };
 }
 
 function load(tabs: readonly Tab[]) {
@@ -111,6 +112,7 @@ const problems = computed(() => {
     if (!d.url.trim()) out.push(`${label}: URL is empty`);
     else if (d.checking || !d.check) out.push(`${label}: checking URL…`);
     else if (!d.check.valid) out.push(`${label}: URL is not valid`);
+    if (/\s/.test(d.testBranch.trim())) out.push(`${label}: branch name can't contain spaces`);
   });
   return out;
 });
@@ -127,6 +129,7 @@ async function save() {
       notifyNewItems: d.notifyNewItems,
       notifyNewComments: d.notifyNewComments,
       notifyChanges: d.notifyChanges,
+      testBranch: (d.check?.kind ?? d.kind) === "mergeRequests" && d.testBranch.trim() ? d.testBranch.trim() : null,
     }));
     load(await api.saveTabs(tabs));
     savedNote.value = true;
@@ -175,6 +178,17 @@ onBeforeUnmount(() => timers.forEach((t) => clearTimeout(t)));
         <div class="hint" :class="{ ok: d.check?.valid, bad: d.check && !d.check.valid }" aria-live="polite">
           <template v-if="d.checking">Checking…</template>
           <template v-else-if="d.check">{{ hint(d.check) }}</template>
+        </div>
+        <div v-if="(d.check?.kind ?? d.kind) === 'mergeRequests'" class="branch">
+          <label :for="`branch-${d.key}`">Only MRs merged into branch</label>
+          <input
+            :id="`branch-${d.key}`"
+            v-model="d.testBranch"
+            type="text"
+            spellcheck="false"
+            placeholder="optional, e.g. resource-test"
+            @input="touch"
+          />
         </div>
         <div class="toggles">
           <label class="toggle"><input v-model="d.notifyNewItems" type="checkbox" @change="touch" /> New items</label>
@@ -249,6 +263,20 @@ onBeforeUnmount(() => timers.forEach((t) => clearTimeout(t)));
 }
 .hint.bad {
   color: var(--red);
+}
+.branch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+}
+.branch label {
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+.branch input {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
 }
 .toggles {
   display: flex;

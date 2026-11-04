@@ -21,6 +21,8 @@ fragment MrFields on MergeRequest {
   createdAt
   updatedAt
   targetBranch
+  sourceBranch
+  diffHeadSha
   description
   userNotesCount
   upvotes
@@ -33,6 +35,23 @@ fragment MrFields on MergeRequest {
   approvedBy(first: 20) { nodes { username } }
   resolvableDiscussionsCount
   resolvedDiscussionsCount
+  workItemRelations(first: 10) {
+    nodes {
+      linkType
+      workItem {
+        iid
+        reference(full: false)
+        title
+        webUrl
+        state
+        widgets {
+          __typename
+          ... on WorkItemWidgetStatus { status { name color } }
+          ... on WorkItemWidgetLabels { labels { nodes { title color textColor } } }
+        }
+      }
+    }
+  }
   project { fullPath }
   author { username name avatarUrl }
   milestone { title }

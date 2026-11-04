@@ -95,6 +95,7 @@
 | any reviewer `reviewState == REQUESTED_CHANGES` or `detailedMergeStatus == REQUESTED_CHANGES` | Changes requested |
 | `detailedMergeStatus == DISCUSSIONS_NOT_RESOLVED` or unresolved threads > 0 | Unresolved threads |
 | not approved for real (`approved == false`, or fewer approvers in `approvedBy` than `max(approvalsRequired, 1)`) / `detailedMergeStatus == NOT_APPROVED` | Needs approval |
+| `detailedMergeStatus == MERGEABLE` and the linked ticket has a `state::` label other than "Ready to Merge" (FR-036) | Approved |
 | `detailedMergeStatus == MERGEABLE` | Ready to merge |
 | otherwise (e.g. `CI_STILL_RUNNING`, `CHECKING`) | none (the pipeline icon shows running) |
 
@@ -210,6 +211,26 @@
 ## R17. Host
 
 - **Decision**: v1 supports only `https://gitlab.com` (spec Assumptions). The host is a constant (`GITLAB_HOST`) in `src-tauri/src/config.rs`, not a setting, which keeps the token form, capabilities and the URL check simple. Supporting self-hosted later means turning the constant into a setting.
+
+## R18. Test-branch membership (FR-034, added 2026-11-04)
+
+- **Context**: the user merges feature branches into a shared `resource-test` branch with ordinary merge commits ("Merge branch '<x>' of gitlab.com:… into resource-test", two parents), and wants to see which open MRs are on it.
+- **Decision**: per MR, using the REST API (GraphQL has no ancestry query):
+  1. `GET projects/:p/repository/branches/:test` → test head (404 → branch absent in that project).
+  2. Up to date ⇔ MR `diffHeadSha` is an ancestor of the test head: `GET repository/merge_base?refs[]=<head>&refs[]=<test>` returns `<head>`.
+  3. Otherwise, the newest first-parent merge on the test branch whose title contains `'<source>'` or `/<source>'` (`GET repository/commits?ref_name=<test>&first_parent=true&per_page=100`); if its second parent is an ancestor of the MR head → outdated. Else not on test.
+  4. Results are cached by (project, MR head, test head), so an unchanged test branch costs one request per project per poll.
+- **Rejected**: comparing `merge_base(test, head)` against `main`. A branch that merged `main` after being merged into the test branch has several merge bases with it, and GitLab returns just one, often a `main` commit, so `!18059` read as "not on test" although merged the day before. `merge_base(a, b) == a` is exact because an ancestor is the unique best common ancestor. Also rejected: the compare API (returns full diffs, heavy for a 600-commit branch) and set comparison via `ref_name=a..b` ranges (works, but needs many pages per busy branch).
+- **Verified live (2026-11-04)** on `login5/login-eko/login-eko`: 10 of 12 open MRs on `resource-test`, `!18059` outdated (7 commits pushed after the merge), `!19469` and `!19183` not on test.
+
+## R19. Linked ticket of an MR (FR-036, added 2026-11-04)
+
+- **Field**: `MergeRequest.workItemRelations(first: 10) { nodes { linkType workItem { iid reference title webUrl state widgets { __typename …Status …Labels } } } }`. `closingIssuesReferences` doesn't exist on GitLab.com's `MergeRequest`; `linkedWorkItems` is deprecated in 19.2 in favour of `workItemRelations`.
+- **Finding**: on `login5`, most MRs link their ticket only as `MENTIONED` (e.g. !19717 → #19368), a few as `CLOSES`, and some mention unrelated tickets too (!19469 mentions #18442, #13876 and #19450). Branch names start with the ticket number.
+- **Decision**: `CLOSES` wins; otherwise the related item whose iid is the leading digits of `sourceBranch`. No guess beyond that.
+- **Workflow state**: the team's state is the scoped label `state::…` (To do / In Development / Ready for Testing / In Testing / Ready to Merge). GitLab's status widget says "To do" on nearly all of them, so it's only a fallback.
+- **Fallback (FR-036b)**: when the relations don't contain the branch-number ticket (none linked: !19667, !16339; or past the first 10: !18059 has 11 and #14796 is last), one `project.workItems(iids: [...])` query per project fetches the missing ones (`queries/tickets_by_iid.graphql`, `gitlab::tickets`). Only sent with a non-empty `iids` list: with the argument missing GitLab returns the project's latest 100 work items instead. A failed lookup leaves the MR without a ticket rather than failing the tab.
+- **Cost**: the 50-MR page with these fields stays under GitLab's query complexity limit (verified on all three MR queries, 2026-11-04).
 
 ---
 

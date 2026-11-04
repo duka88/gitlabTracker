@@ -123,13 +123,13 @@ impl<'a> PollRun<'a> {
             let Some(result) = fetched.remove(&tab.id) else {
                 continue;
             };
-            let fingerprint = url_fingerprint(&tab.url);
+            let fingerprint = url_fingerprint(&tab.fingerprint_source());
             let ts = state
                 .tabs
                 .entry(tab.id.clone())
-                .or_insert_with(|| TabState::for_url(&tab.url));
+                .or_insert_with(|| TabState::for_url(&tab.fingerprint_source()));
             if ts.url_fingerprint != fingerprint {
-                *ts = TabState::for_url(&tab.url);
+                *ts = TabState::for_url(&tab.fingerprint_source());
             }
             let result = match result {
                 Ok(r) => r,

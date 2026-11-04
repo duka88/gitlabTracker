@@ -227,3 +227,23 @@ fn error_keeps_last_items() {
     poll_tabs(&mut st, &tabs, None, later(4), vec![("a", vec![mr(1)])]);
     assert!(st.tabs["a"].error.is_none());
 }
+
+/// FR-034: a tab with a test branch keeps its baseline between polls (its fingerprint
+/// includes the branch), so an MR newly merged into the test branch is NEW and notifies.
+#[test]
+fn test_branch_tab_keeps_baseline_and_notifies() {
+    let mut t = tab("a", "On test", ListKind::MergeRequests);
+    t.test_branch = Some("resource-test".into());
+    let tabs = vec![t];
+    let mut st = PersistedState::default();
+    poll_tabs(&mut st, &tabs, None, t0(), vec![("a", vec![mr(1)])]);
+    assert!(st.tabs["a"].baseline_done);
+    let n = poll_tabs(
+        &mut st,
+        &tabs,
+        None,
+        later(2),
+        vec![("a", vec![mr(2), mr(1)])],
+    );
+    assert_eq!(n, vec!["New in On test: !2 MR 2"]);
+}

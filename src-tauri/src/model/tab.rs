@@ -23,6 +23,10 @@ pub struct Tab {
     pub notify_new_comments: bool,
     #[serde(default = "yes")]
     pub notify_changes: bool,
+    /// MR tabs only: show just the MRs whose source branch is merged into this branch
+    /// (e.g. a shared test branch), FR-034.
+    #[serde(default)]
+    pub test_branch: Option<String>,
 }
 
 fn yes() -> bool {
@@ -41,6 +45,16 @@ impl Tab {
             notify_new_items: true,
             notify_new_comments: true,
             notify_changes: true,
+            test_branch: None,
+        }
+    }
+
+    /// What identifies the tab's list: the URL, plus the test branch when set. A change
+    /// resets the tab's baseline like a URL edit (FR-014, FR-034).
+    pub fn fingerprint_source(&self) -> String {
+        match &self.test_branch {
+            Some(b) => format!("{}\ntest_branch={b}", self.url),
+            None => self.url.clone(),
         }
     }
 }

@@ -110,6 +110,19 @@ fn project_mrs_page_info() {
     assert!(page.end_cursor.is_some());
 }
 
+/// FR-036: the linked ticket and its workflow state come through the list query.
+#[test]
+fn project_mr_linked_ticket() {
+    let d = fixture("mrs_project_page1");
+    let (items, _, _) = parse_mr_page(&d["data"]["project"]["mergeRequests"]).unwrap();
+    let mr = items[0].mr.as_ref().unwrap();
+    let t = mr.ticket.as_ref().expect("ticket from the branch number");
+    assert_eq!(t.reference, format!("#{}", items[0].iid));
+    assert_eq!(t.state_label.as_ref().unwrap().value, "Ready for Testing");
+    assert!(t.open);
+    assert_eq!(items[1].mr.as_ref().unwrap().ticket, None);
+}
+
 #[test]
 fn group_work_items() {
     let d = fixture("work_items_group");

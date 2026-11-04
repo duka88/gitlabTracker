@@ -18,6 +18,8 @@ All types live in Rust (`src-tauri/src/model/`) and derive `Serialize`/`Deserial
 
 The host is fixed to `https://gitlab.com` in v1 (constant `GITLAB_HOST`, research R17). The token is **not** stored here. It's in the Keychain, under service `com.duka88.gitlab-tracker` and account `gitlab-token:gitlab.com`.
 
+Added 2026-11-04: `test_branch: Option<String>`, the branch flagged on every MR (FR-037). Trimmed; blank or with whitespace → `None` (`normalize_branch`).
+
 ### UserInfo
 
 `id: String` (GraphQL gid), `username`, `name`, `avatar_url`.
@@ -33,8 +35,9 @@ The host is fixed to `https://gitlab.com` in v1 (constant `GITLAB_HOST`, researc
 | `notify_new_items` | `bool` | |
 | `notify_new_comments` | `bool` | Allowed on every tab type (clarification, round 2). |
 | `notify_changes` | `bool` | |
+| `test_branch` | `Option<String>` | MR tabs only: show just the MRs merged into this branch (FR-034). Trimmed; no whitespace; dropped on work-item tabs. |
 
-Changing `url` resets that tab's `TabState` (no notifications on the next load, FR-019).
+Changing `url` or `test_branch` resets that tab's `TabState` (no notifications on the next load, FR-019). The `TabState` fingerprint is taken over `url` plus `\ntest_branch=<b>` when a test branch is set (`Tab::fingerprint_source`).
 
 ## TabQuery (derived, not persisted)
 
@@ -55,7 +58,11 @@ Common fields:
 
 `Mr` only:
 - `draft`, `target_branch`, `state`, `pipeline: Option<PipelineStatus>`
-- `approvals: { approved: bool, required: u32, given: u32 }`
+- `approvals: { approved: bool, required: u32, given: u32 }`: `given` counts `approvedBy`; `approved` also needs `given >= max(required, 1)` (FR-025a)
+- `unresolved_threads: u32` (resolvable − resolved threads, FR-025b)
+- `source_branch`, `head_sha` (`diffHeadSha`)
+- `on_branch: Option<{ branch, up_to_date: bool, merged_at: Option<DateTime> }>`: set in tabs with a test branch, or on every MR when the global test branch is set (FR-034, FR-037, research R18)
+- `ticket: Option<LinkedTicket>`: `{ reference, title, web_url, open, state_label: Option<Label>, status: Option<WorkStatus> }` (FR-036, research R19)
 - `reviewers: Vec<Reviewer>` (`Person` + `approved: bool` + `review_state`)
 - `merge_status: Option<MergeStatusTag>`
 
@@ -67,7 +74,7 @@ Common fields:
 
 `Label`: `title`, `color`, `text_color`, and derived `scope: Option<String>` plus `value` (split on the **last** `::`, as GitLab does).
 `Person`: `username`, `name`, `avatar_url`. This is always an `avatar://localhost/<percent-encoded absolute GitLab URL>` (relative GitLab paths are made absolute first), so the webview never contacts GitLab (research R16).
-`MergeStatusTag`: `ReadyToMerge | NeedsApproval | CiFailed | Conflicts | ChangesRequested | UnresolvedThreads` (derivation table in research R5).
+`MergeStatusTag`: `ReadyToMerge | Approved | NeedsApproval | CiFailed | Conflicts | ChangesRequested | UnresolvedThreads` (derivation table in research R5).
 
 ## TabState (persisted: `state.json`, keyed by tab id)
 
@@ -133,19 +140,19 @@ Per-poll only (in memory, dropped after each poll): `poll_notified: HashSet<Stri
 2. **Mentions** (if `notify_mentions`): fetch to-dos. If there's no baseline yet, record ids and the baseline time and go on. Otherwise, for each new to-do, add `note.id` to `seen_comment_ids` (if present) and create a `Mention` notification, unless the item is in the visible tab (FR-022f).
 3. **Tabs** (concurrently): fetch all pages and save the result. On error, set `error`, keep the old items and continue.
 4. For each tab with `baseline_done == false`: store `items` and `tracked`, set `baseline_done` and `baseline_at`, and skip to the next tab.
-5. **Diff** against the previous `tracked`. Order matters for the visible-tab rule: when the window is visible, the active tab is compared **first**, then the other tabs in tab order (the fetches in step 3 run concurrently, the comparison doesn't):
+5. **Diff** against the previous `tracked`. Order matters for the visible-tab rule: when the window is visible and focused (FR-002d), the active tab is compared **first**, then the other tabs in tab order (the fetches in step 3 run concurrently, the comparison doesn't):
    - `added = current − previous` → `new_items`, plus a `NewItem`/`NewItems` notification (if `notify_new_items` and `new:<gid>` isn't in `poll_notified`).
    - `comment_count` went up (not for added items) → queue the item for comment fetch (if `notify_new_comments`).
    - `TrackedState` differs (not for added items) → `ChangeKind`s (R8) → `changes`, plus a `Change` notification per kind (if `notify_changes`, key `change:<gid>:<kind>` not in `poll_notified`).
    - `removed` MR ids (open-MR tabs only, `notify_changes`) → queue for the merged check.
 6. **Comment fetch** (batched): new notes not in `seen_comment_ids`, not `system`, not by the signed-in user, created after `baseline_at` → `new_comments[gid] += 1`, plus one `Comment` notification per note. Add every fetched note id to `seen_comment_ids`.
 7. **Merged check** (batched): `state == merged` and `mergeUser != me` → `Change(Merged)` notification.
-8. **Visible-tab rule** (FR-023a, applied during steps 5–7): when the window is visible, markers for `active_tab_id` are still set and their gids are added to the global `seen_while_visible`, but no notifications or bell entries are created. Their keys (`new:<gid>`, `change:<gid>:<kind>`) go into `poll_notified` and their note ids into `seen_comment_ids`, so a hidden tab holding the same item can't notify for it in this check (that's why the active tab is compared first). From the next check on, the item is in every tab's previous result, so it can't count as new again.
+8. **Visible-tab rule** (FR-023a, applied during steps 5–7): when the window is visible and focused (FR-002d), markers for `active_tab_id` are still set and their gids are added to the global `seen_while_visible`, but no notifications or bell entries are created. Their keys (`new:<gid>`, `change:<gid>:<kind>`) go into `poll_notified` and their note ids into `seen_comment_ids`, so a hidden tab holding the same item can't notify for it in this check (that's why the active tab is compared first). From the next check on, the item is in every tab's previous result, so it can't count as new again.
 9. Recompute counts. Tab badge = gids with markers in that tab, minus the global `seen_while_visible`. `menu_count` = distinct gids across all tab badges (FR-004). Mentions never add to either count (FR-022g). Update the tray title, persist, and emit `state://updated`.
 
 ### Marker clearing
 
-- `select_tab(id)` (and the window becoming visible with that tab active) → clear `new_items`, `new_comments` and `changes` for that tab, remove from `seen_while_visible` every gid that no tab has a marker for any more, then recompute `menu_count` (FR-023).
+- `select_tab(id)` (and the window being shown or regaining focus with that tab active, FR-002d) → clear `new_items`, `new_comments` and `changes` for that tab, remove from `seen_while_visible` every gid that no tab has a marker for any more, then recompute `menu_count` (FR-023).
 - `open_bell()` → mark all `NotificationEntry.read = true`, so `bell_unread` becomes 0 (FR-024c). Tab markers aren't touched.
 
 ## Validation rules (summary)

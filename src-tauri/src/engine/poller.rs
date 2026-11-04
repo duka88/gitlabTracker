@@ -17,10 +17,12 @@ use super::poll::{PollRun, recompute_counts};
 use crate::app_state::{Shared, emit_view};
 use crate::error::{AppError, Issue};
 use crate::gitlab::GitLabClient;
+use crate::gitlab::branch_check::filter_on_branch;
 use crate::gitlab::lists::{FetchResult, fetch_tab};
 use crate::gitlab::mentions::fetch_mentions;
 use crate::gitlab::merged::check_merged;
 use crate::gitlab::notes::fetch_notes;
+use crate::gitlab::tickets::fill_missing_tickets;
 use crate::url_map::parse_tab_url;
 
 const MAX_CONCURRENT_TABS: usize = 4;
@@ -128,7 +130,7 @@ pub async fn run_poll(
     notifier: &dyn Notifier,
 ) {
     let _ = app.emit("poll://started", ());
-    let (token, tabs, me, visible, notify_mentions) = {
+    let (token, tabs, me, visible, notify_mentions, global_branch) = {
         let mut c = core.lock().await;
         c.polling = true;
         (
@@ -137,6 +139,7 @@ pub async fn run_poll(
             c.settings.user.as_ref().map(|u| u.username.clone()),
             c.visible_tab(),
             c.settings.notify_mentions,
+            c.settings.test_branch.clone(),
         )
     };
     let Some(token) = token else {
@@ -163,10 +166,26 @@ pub async fn run_poll(
             let client = client.clone();
             let id = t.id.clone();
             let url = t.url.clone();
+            let test_branch = t.test_branch.clone();
+            let flag_branch = (t.kind == crate::model::ListKind::MergeRequests)
+                .then(|| global_branch.clone())
+                .flatten();
             async move {
                 let result = match parse_tab_url(&url) {
                     Ok(q) => fetch_tab(&client, &q).await,
                     Err(e) => Err(AppError::Invalid(e.0)),
+                };
+                let result = match result {
+                    Ok(mut r) => {
+                        let _ = fill_missing_tickets(&client, &mut r.items).await;
+                        Ok(r)
+                    }
+                    e => e,
+                };
+                let result = match (result, test_branch, flag_branch) {
+                    (Ok(r), Some(b), _) => only_on_branch(&client, r, &b, false).await,
+                    (Ok(r), None, Some(b)) => only_on_branch(&client, r, &b, true).await,
+                    (r, _, _) => r,
                 };
                 (id, result)
             }
@@ -255,4 +274,24 @@ pub async fn run_poll(
     c.last_poll_at = Some(now);
     c.save_state();
     emit_view(app, &c);
+}
+
+/// Narrows an MR tab to the MRs on its test branch (FR-034), or flags them (FR-037).
+/// With `keep_all`, every MR stays and only gets its flag (FR-037).
+async fn only_on_branch(
+    client: &GitLabClient,
+    mut r: FetchResult,
+    branch: &str,
+    keep_all: bool,
+) -> Result<FetchResult, AppError> {
+    let (items, warning) =
+        filter_on_branch(client, std::mem::take(&mut r.items), branch, keep_all).await?;
+    r.items = items;
+    if let Some(w) = warning {
+        r.warning = Some(match r.warning.take() {
+            Some(prev) => Issue::warning("warning", format!("{} · {w}", prev.message)),
+            None => Issue::warning("warning", w),
+        });
+    }
+    Ok(r)
 }

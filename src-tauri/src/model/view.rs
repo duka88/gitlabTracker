@@ -18,6 +18,7 @@ pub struct AppView {
     pub user: Option<UserInfo>,
     pub interval_minutes: u8,
     pub notify_mentions: bool,
+    pub test_branch: Option<String>,
     pub polling: bool,
     pub last_poll_at: Option<DateTime<Utc>>,
     pub active_tab_id: Option<String>,

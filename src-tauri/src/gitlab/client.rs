@@ -59,6 +59,28 @@ impl GitLabClient {
     }
 }
 
+impl GitLabClient {
+    /// GET on the REST API (`/api/v4/<path>`), for what GraphQL doesn't offer (FR-034).
+    /// 404 becomes [`AppError::NotFound`] so callers can treat it as "absent".
+    pub async fn rest_get(&self, path: &str) -> AppResult<Value> {
+        let resp = self
+            .http
+            .get(format!("{GITLAB_HOST}/api/v4/{path}"))
+            .bearer_auth(&self.token)
+            .send()
+            .await
+            .map_err(|_| AppError::Unreachable)?;
+        match resp.status().as_u16() {
+            200 => resp.json().await.map_err(|_| AppError::Unreachable),
+            401 => Err(AppError::TokenRejected),
+            403 => Err(AppError::NoPermission),
+            404 => Err(AppError::NotFound("Not found".into())),
+            429 => Err(AppError::RateLimited),
+            s => Err(AppError::Query(format!("GitLab error (HTTP {s})"))),
+        }
+    }
+}
+
 /// Maps an HTTP status and GraphQL body to `data` or an [`AppError`] (pure, unit-tested).
 pub fn classify(status: u16, mut body: Value) -> AppResult<Value> {
     match status {

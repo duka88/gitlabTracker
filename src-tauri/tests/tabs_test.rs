@@ -86,3 +86,50 @@ fn duplicate_ids_get_fresh_ids() {
     let out = apply_tab_edits(vec![t.clone(), t], &mut st).unwrap();
     assert_ne!(out[0].id, out[1].id);
 }
+
+/// FR-034: the test branch is trimmed, kept only on MR tabs, and changing it resets the
+/// baseline like a URL edit.
+#[test]
+fn test_branch_is_normalized_and_resets_baseline() {
+    let tabs = default_tabs();
+    let mut st = state_with_baselines(&tabs);
+    let mut edited = tabs.clone();
+    edited[0].test_branch = Some("  resource-test ".into()); // "My MRs" (MR tab)
+    edited[2].test_branch = Some("resource-test".into()); // work-item tab: dropped
+    edited[1].test_branch = Some("   ".into()); // blank: dropped
+    let out = apply_tab_edits(edited, &mut st).unwrap();
+    assert_eq!(out[0].test_branch.as_deref(), Some("resource-test"));
+    assert_eq!(out[1].test_branch, None);
+    assert_eq!(out[2].kind, ListKind::WorkItems);
+    assert_eq!(out[2].test_branch, None);
+    assert!(!st.tabs[&tabs[0].id].baseline_done);
+    assert!(st.tabs[&tabs[1].id].baseline_done);
+    assert!(st.tabs[&tabs[2].id].baseline_done);
+
+    // Saving again unchanged keeps the new baseline id.
+    let fp = st.tabs[&tabs[0].id].url_fingerprint.clone();
+    apply_tab_edits(out, &mut st).unwrap();
+    assert_eq!(st.tabs[&tabs[0].id].url_fingerprint, fp);
+}
+
+#[test]
+fn test_branch_with_spaces_is_rejected() {
+    let tabs = default_tabs();
+    let mut st = state_with_baselines(&tabs);
+    let mut edited = tabs.clone();
+    edited[0].test_branch = Some("resource test".into());
+    assert!(apply_tab_edits(edited, &mut st).is_err());
+}
+
+/// FR-037: the global test branch is trimmed; blank or with spaces is dropped.
+#[test]
+fn global_test_branch_is_normalized() {
+    use gitlab_tracker_lib::model::normalize_branch;
+    assert_eq!(
+        normalize_branch(Some(" resource-test ".into())).as_deref(),
+        Some("resource-test")
+    );
+    assert_eq!(normalize_branch(Some("  ".into())), None);
+    assert_eq!(normalize_branch(Some("a b".into())), None);
+    assert_eq!(normalize_branch(None), None);
+}

@@ -102,7 +102,9 @@
               ]
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19725-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004d0d"
           },
           {
             "id": "gid://gitlab/MergeRequest/560826307",
@@ -189,7 +191,9 @@
               ]
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19710-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004cfe"
           },
           {
             "id": "gid://gitlab/MergeRequest/558657100",
@@ -309,7 +313,9 @@
               "nodes": []
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19540-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004c54"
           },
           {
             "id": "gid://gitlab/MergeRequest/557986982",
@@ -397,7 +403,9 @@
               "nodes": []
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19494-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004c26"
           }
         ]
       }

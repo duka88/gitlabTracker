@@ -72,9 +72,9 @@ impl Core {
         state.tabs.retain(|id, _| ids.contains(id.as_str()));
         for t in &settings.tabs {
             if let Some(ts) = state.tabs.get_mut(&t.id)
-                && ts.url_fingerprint != url_fingerprint(&t.url)
+                && ts.url_fingerprint != url_fingerprint(&t.fingerprint_source())
             {
-                *ts = TabState::for_url(&t.url);
+                *ts = TabState::for_url(&t.fingerprint_source());
             }
         }
         Core {
@@ -149,6 +149,7 @@ impl Core {
             user: self.settings.user.clone(),
             interval_minutes: self.settings.interval_minutes,
             notify_mentions: self.settings.notify_mentions,
+            test_branch: self.settings.test_branch.clone(),
             polling: self.polling,
             last_poll_at: self.last_poll_at,
             active_tab_id: self.active_tab(),
@@ -201,6 +202,15 @@ pub fn apply_tab_edits(new_tabs: Vec<Tab>, state: &mut PersistedState) -> Result
         tab.url = tab.url.trim().to_string();
         let q = parse_tab_url(&tab.url).map_err(|e| format!("{}: {e}", tab.name))?;
         tab.kind = q.kind;
+        tab.test_branch = match (tab.kind, tab.test_branch.as_deref().map(str::trim)) {
+            (crate::model::ListKind::MergeRequests, Some(b)) if !b.is_empty() => {
+                if b.chars().any(char::is_whitespace) {
+                    return Err(format!("{}: a branch name can't contain spaces", tab.name));
+                }
+                Some(b.to_string())
+            }
+            _ => None,
+        };
         if tab.id.is_empty() || !ids.insert(tab.id.clone()) {
             tab.id = uuid::Uuid::new_v4().to_string();
             ids.insert(tab.id.clone());
@@ -209,14 +219,16 @@ pub fn apply_tab_edits(new_tabs: Vec<Tab>, state: &mut PersistedState) -> Result
     }
     state.tabs.retain(|id, _| ids.contains(id));
     for tab in &out {
-        let fp = url_fingerprint(&tab.url);
+        let fp = url_fingerprint(&tab.fingerprint_source());
         match state.tabs.get_mut(&tab.id) {
-            Some(ts) if ts.url_fingerprint != fp => *ts = TabState::for_url(&tab.url),
+            Some(ts) if ts.url_fingerprint != fp => {
+                *ts = TabState::for_url(&tab.fingerprint_source());
+            }
             Some(_) => {}
             None => {
                 state
                     .tabs
-                    .insert(tab.id.clone(), TabState::for_url(&tab.url));
+                    .insert(tab.id.clone(), TabState::for_url(&tab.fingerprint_source()));
             }
         }
     }

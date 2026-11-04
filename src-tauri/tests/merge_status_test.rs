@@ -1,6 +1,8 @@
 //! Every row of the research R5 merge-status derivation table.
 #![allow(clippy::needless_pass_by_value)]
-use gitlab_tracker_lib::gitlab::parse::{MrRaw, effectively_approved, merge_status, mr_to_item};
+use gitlab_tracker_lib::gitlab::parse::{
+    MrRaw, effectively_approved, merge_status, mr_to_item, pick_ticket, ticket_blocks_merge,
+};
 use gitlab_tracker_lib::model::MergeStatusTag as T;
 use serde_json::json;
 
@@ -170,4 +172,135 @@ fn approvals_given_falls_back_without_approver_list() {
     assert_eq!(item.approvals.given, 1);
     assert!(item.approvals.approved);
     assert_eq!(merge_status(&m), Some(T::ReadyToMerge));
+}
+
+fn rel(link: &str, iid: &str, state_label: Option<&str>) -> serde_json::Value {
+    let labels: Vec<_> = state_label
+        .map(|l| json!({ "title": l, "color": "#428bca", "textColor": "#fff" }))
+        .into_iter()
+        .collect();
+    json!({ "linkType": link, "workItem": {
+        "iid": iid, "reference": format!("#{iid}"), "title": format!("Ticket {iid}"),
+        "webUrl": format!("https://gitlab.com/g/p/-/work_items/{iid}"), "state": "OPEN",
+        "widgets": [
+            { "__typename": "WorkItemWidgetLabels", "labels": { "nodes": labels } },
+            { "__typename": "WorkItemWidgetStatus", "status": { "name": "To do", "color": "#737278" } }
+        ]
+    }})
+}
+
+/// FR-036: a CLOSES link wins over the branch-number match.
+#[test]
+fn ticket_prefers_closes_link() {
+    let m = mr(
+        json!({ "sourceBranch": "19368-x", "workItemRelations": { "nodes": [
+        rel("MENTIONED", "19368", Some("state::Ready for Testing")),
+        rel("CLOSES", "19912", Some("state::In Testing")),
+    ] } }),
+    );
+    let t = pick_ticket(&m).unwrap();
+    assert_eq!(t.reference, "#19912");
+    assert_eq!(t.state_label.unwrap().value, "In Testing");
+    assert_eq!(t.status.unwrap().name, "To do");
+}
+
+/// FR-036: without CLOSES, the mention whose iid starts the branch name; other mentions
+/// (e.g. "see #18442") don't count.
+#[test]
+fn ticket_falls_back_to_branch_number() {
+    let m = mr(
+        json!({ "sourceBranch": "19450-web-sign-in", "workItemRelations": { "nodes": [
+        rel("MENTIONED", "18442", None),
+        rel("MENTIONED", "19450", Some("state::Ready for Testing")),
+    ] } }),
+    );
+    assert_eq!(pick_ticket(&m).unwrap().reference, "#19450");
+    let other = mr(
+        json!({ "sourceBranch": "resource-test", "workItemRelations": { "nodes": [
+        rel("MENTIONED", "18442", None)
+    ] } }),
+    );
+    assert_eq!(pick_ticket(&other), None);
+}
+
+/// FR-036: approved + mergeable, but the ticket is "Ready for Testing" → "Approved", not
+/// "Ready to merge" (MR !19717 / #19368 on 2026-11-04).
+#[test]
+fn ticket_not_ready_means_approved_not_ready() {
+    let m = mr(
+        json!({ "sourceBranch": "19368-email", "workItemRelations": { "nodes": [
+        rel("MENTIONED", "19368", Some("state::Ready for Testing"))
+    ] } }),
+    );
+    assert!(ticket_blocks_merge(pick_ticket(&m).as_ref()));
+    assert_eq!(merge_status(&m), Some(T::Approved));
+    assert_eq!(
+        mr_to_item(&m).mr.unwrap().ticket.unwrap().reference,
+        "#19368"
+    );
+}
+
+#[test]
+fn ticket_ready_to_merge_or_without_state_allows_ready() {
+    let ready = mr(
+        json!({ "sourceBranch": "1-a", "workItemRelations": { "nodes": [
+        rel("CLOSES", "1", Some("state::ready to merge"))
+    ] } }),
+    );
+    assert_eq!(merge_status(&ready), Some(T::ReadyToMerge));
+    let no_state = mr(
+        json!({ "sourceBranch": "1-a", "workItemRelations": { "nodes": [
+        rel("CLOSES", "1", Some("priority::P3"))
+    ] } }),
+    );
+    assert!(!ticket_blocks_merge(pick_ticket(&no_state).as_ref()));
+    assert_eq!(merge_status(&no_state), Some(T::ReadyToMerge));
+}
+
+/// Earlier blockers still win over the ticket state.
+#[test]
+fn ticket_state_does_not_hide_needs_approval() {
+    let m = mr(
+        json!({ "approvedBy": { "nodes": [] }, "sourceBranch": "1-a",
+        "workItemRelations": { "nodes": [ rel("CLOSES", "1", Some("state::Ready for Testing")) ] } }),
+    );
+    assert_eq!(merge_status(&m), Some(T::NeedsApproval));
+}
+
+/// FR-036b: MRs without a linked ticket get the one named by their branch number; the
+/// ticket rule then turns "Ready to merge" into "Approved".
+#[test]
+fn missing_ticket_is_looked_up_by_branch_number() {
+    use gitlab_tracker_lib::gitlab::parse::ticket_from;
+    use gitlab_tracker_lib::gitlab::tickets::{apply_tickets, missing_tickets, parse_tickets};
+    use std::collections::HashMap;
+
+    let mut a = mr_to_item(&mr(json!({ "sourceBranch": "14796-bulk-import" })));
+    a.project_path = "g/p".into();
+    let mut b = mr_to_item(&mr(json!({ "sourceBranch": "resource-test" })));
+    b.project_path = "g/p".into();
+    assert_eq!(a.mr.as_ref().unwrap().merge_status, Some(T::ReadyToMerge));
+    let need = missing_tickets(&[a.clone(), b.clone()]);
+    assert_eq!(need["g/p"].iter().collect::<Vec<_>>(), vec!["14796"]);
+
+    let data = json!({ "project": { "workItems": { "nodes": [ rel("MENTIONED", "14796", Some("state::In Development"))["workItem"].clone() ] } } });
+    let found: HashMap<_, _> = parse_tickets(&data)
+        .iter()
+        .map(|w| (("g/p".to_string(), w.iid.clone()), ticket_from(w)))
+        .collect();
+    let mut items = vec![a, b];
+    apply_tickets(&mut items, &found);
+    let m = items[0].mr.as_ref().unwrap();
+    assert_eq!(
+        m.ticket
+            .as_ref()
+            .unwrap()
+            .state_label
+            .as_ref()
+            .unwrap()
+            .value,
+        "In Development"
+    );
+    assert_eq!(m.merge_status, Some(T::Approved));
+    assert_eq!(items[1].mr.as_ref().unwrap().ticket, None);
 }

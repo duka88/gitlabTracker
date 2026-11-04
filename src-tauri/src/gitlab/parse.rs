@@ -6,8 +6,8 @@ use serde_json::Value;
 
 use crate::config::avatar_proxy_url;
 use crate::model::{
-    Approvals, Children, Health, Label, ListItem, ListKind, MergeStatusTag, MrFields, Person,
-    PipelineStatus, Reviewer, WorkItemFields, WorkStatus,
+    Approvals, Children, Health, Label, LinkedTicket, ListItem, ListKind, MergeStatusTag, MrFields,
+    Person, PipelineStatus, READY_TO_MERGE_STATE, Reviewer, WorkItemFields, WorkStatus,
 };
 use crate::text::preview;
 
@@ -69,6 +69,26 @@ pub struct PipelineRaw {
     pub status: Option<String>,
 }
 
+/// One `workItemRelations` node of an MR.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct RelationRaw {
+    /// `CLOSES` or `MENTIONED`.
+    pub link_type: String,
+    pub work_item: Option<LinkedWorkItemRaw>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct LinkedWorkItemRaw {
+    pub iid: String,
+    pub reference: String,
+    pub title: String,
+    pub web_url: String,
+    pub state: String,
+    pub widgets: Vec<Value>,
+}
+
 /// A user known only by username (e.g. `approvedBy`).
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default)]
@@ -90,6 +110,8 @@ pub struct MrRaw {
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
     pub target_branch: String,
+    pub source_branch: String,
+    pub diff_head_sha: Option<String>,
     pub description: Option<String>,
     pub user_notes_count: Option<u32>,
     pub upvotes: u32,
@@ -102,6 +124,7 @@ pub struct MrRaw {
     pub approved_by: Option<Nodes<UserRef>>,
     pub resolvable_discussions_count: Option<u32>,
     pub resolved_discussions_count: Option<u32>,
+    pub work_item_relations: Option<Nodes<RelationRaw>>,
     pub project: Option<PathRaw>,
     pub author: Option<PersonRaw>,
     pub milestone: Option<Titled>,
@@ -135,7 +158,75 @@ pub fn unresolved_threads(mr: &MrRaw) -> u32 {
         .saturating_sub(mr.resolved_discussions_count.unwrap_or(0))
 }
 
-/// Merge status tag, first match wins (research R5 table, FR-025a).
+/// The ticket an MR resolves (FR-036): a `CLOSES` link wins; otherwise the linked item whose
+/// iid is the leading number of the source branch (`19368-email-…` → `#19368`).
+pub fn pick_ticket(mr: &MrRaw) -> Option<LinkedTicket> {
+    let rels = mr.work_item_relations.as_ref()?;
+    let items = || {
+        rels.nodes
+            .iter()
+            .filter_map(|r| r.work_item.as_ref().map(|w| (r, w)))
+    };
+    let branch_iid = branch_ticket_iid(&mr.source_branch);
+    let (_, w) = items().find(|(r, _)| r.link_type == "CLOSES").or_else(|| {
+        branch_iid
+            .as_deref()
+            .and_then(|iid| items().find(|(_, w)| w.iid == iid))
+    })?;
+    Some(ticket_from(w))
+}
+
+/// Leading digits of a branch name (`19368-email-…` → `19368`), the ticket-number convention.
+pub fn branch_ticket_iid(source_branch: &str) -> Option<String> {
+    let iid: String = source_branch
+        .chars()
+        .take_while(char::is_ascii_digit)
+        .collect();
+    (!iid.is_empty()).then_some(iid)
+}
+
+/// Builds the ticket chip data from a work item node (relation or direct lookup).
+pub fn ticket_from(w: &LinkedWorkItemRaw) -> LinkedTicket {
+    let labels = widget(&w.widgets, "WorkItemWidgetLabels")
+        .and_then(|x| x.pointer("/labels/nodes"))
+        .and_then(|n| serde_json::from_value::<Vec<LabelRaw>>(n.clone()).ok())
+        .unwrap_or_default();
+    let state_label = labels.iter().map(label).find(|l| {
+        l.scope
+            .as_deref()
+            .is_some_and(|s| s.eq_ignore_ascii_case("state"))
+    });
+    let status = widget(&w.widgets, "WorkItemWidgetStatus")
+        .and_then(|x| x.get("status"))
+        .filter(|x| !x.is_null())
+        .and_then(|s| {
+            Some(WorkStatus {
+                name: s.get("name")?.as_str()?.to_string(),
+                color: s.get("color").and_then(Value::as_str).map(str::to_string),
+            })
+        });
+    LinkedTicket {
+        reference: if w.reference.is_empty() {
+            format!("#{}", w.iid)
+        } else {
+            w.reference.clone()
+        },
+        title: w.title.clone(),
+        web_url: w.web_url.clone(),
+        open: !w.state.eq_ignore_ascii_case("CLOSED"),
+        state_label,
+        status,
+    }
+}
+
+/// True when the ticket's workflow state blocks merging (FR-036): it has a `state::` label
+/// other than "Ready to Merge". No ticket or no state label doesn't block.
+pub fn ticket_blocks_merge(t: Option<&LinkedTicket>) -> bool {
+    t.and_then(|t| t.state_label.as_ref())
+        .is_some_and(|l| !l.value.trim().eq_ignore_ascii_case(READY_TO_MERGE_STATE))
+}
+
+/// Merge status tag, first match wins (research R5 table, FR-025a, FR-036).
 pub fn merge_status(mr: &MrRaw) -> Option<MergeStatusTag> {
     let detailed = mr.detailed_merge_status.as_deref().unwrap_or("");
     let pipeline = mr.head_pipeline.as_ref().and_then(|p| p.status.as_deref());
@@ -166,6 +257,9 @@ pub fn merge_status(mr: &MrRaw) -> Option<MergeStatusTag> {
         return Some(MergeStatusTag::NeedsApproval);
     }
     if detailed == "MERGEABLE" {
+        if ticket_blocks_merge(pick_ticket(mr).as_ref()) {
+            return Some(MergeStatusTag::Approved);
+        }
         return Some(MergeStatusTag::ReadyToMerge);
     }
     None
@@ -251,6 +345,10 @@ pub fn mr_to_item(mr: &MrRaw) -> ListItem {
                 given: approvals_given(mr),
             },
             unresolved_threads: unresolved_threads(mr),
+            source_branch: mr.source_branch.clone(),
+            head_sha: mr.diff_head_sha.clone().unwrap_or_default(),
+            on_branch: None,
+            ticket: pick_ticket(mr),
             reviewers,
             merge_status: merge_status(mr),
         }),

@@ -46,6 +46,18 @@ pub struct MrFields {
     /// Resolvable threads not yet resolved (FR-025b).
     #[serde(default)]
     pub unresolved_threads: u32,
+    #[serde(default)]
+    pub source_branch: String,
+    /// Latest commit of the source branch.
+    #[serde(default)]
+    pub head_sha: String,
+    /// Set in tabs with a test branch, or on every MR when a global test branch is set
+    /// (FR-034, FR-037).
+    #[serde(default)]
+    pub on_branch: Option<OnBranch>,
+    /// The ticket this MR resolves (FR-036).
+    #[serde(default)]
+    pub ticket: Option<LinkedTicket>,
     pub reviewers: Vec<Reviewer>,
     pub merge_status: Option<MergeStatusTag>,
 }
@@ -141,10 +153,41 @@ impl PipelineStatus {
     }
 }
 
+/// The work item an MR resolves (FR-036): its "closes" link, else the linked item whose
+/// number starts the source branch name.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkedTicket {
+    pub reference: String,
+    pub title: String,
+    pub web_url: String,
+    pub open: bool,
+    /// The `state::<value>` label, the team's workflow state (e.g. "Ready for Testing").
+    pub state_label: Option<Label>,
+    /// GitLab's own status widget, when it has one.
+    pub status: Option<WorkStatus>,
+}
+
+/// Workflow state that allows merging (FR-036), compared case-insensitively.
+pub const READY_TO_MERGE_STATE: &str = "Ready to Merge";
+
+/// Whether an MR's source branch is merged into a tab's test branch (FR-034).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OnBranch {
+    pub branch: String,
+    /// False when commits were pushed after the last merge into the test branch.
+    pub up_to_date: bool,
+    /// When the source branch was last merged into the test branch, if found.
+    pub merged_at: Option<DateTime<Utc>>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum MergeStatusTag {
     ReadyToMerge,
+    /// Approved and mergeable, but the linked ticket isn't in the ready-to-merge state.
+    Approved,
     NeedsApproval,
     CiFailed,
     Conflicts,

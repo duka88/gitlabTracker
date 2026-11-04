@@ -59,7 +59,44 @@
               "nodes": []
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19745-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004d21",
+            "workItemRelations": {
+              "nodes": [
+                {
+                  "linkType": "MENTIONED",
+                  "workItem": {
+                    "iid": "19745",
+                    "reference": "#19745",
+                    "title": "Linked ticket",
+                    "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19745",
+                    "state": "OPEN",
+                    "widgets": [
+                      {
+                        "__typename": "WorkItemWidgetLabels",
+                        "labels": {
+                          "nodes": [
+                            {
+                              "title": "state::Ready for Testing",
+                              "color": "#6699cc",
+                              "textColor": "#FFFFFF"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "__typename": "WorkItemWidgetStatus",
+                        "status": {
+                          "name": "To do",
+                          "color": "#737278"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "id": "gid://gitlab/MergeRequest/561006148",
@@ -135,7 +172,9 @@
               ]
             },
             "resolvableDiscussionsCount": 0,
-            "resolvedDiscussionsCount": 0
+            "resolvedDiscussionsCount": 0,
+            "sourceBranch": "19739-feature",
+            "diffHeadSha": "0000000000000000000000000000000000004d1b"
           }
         ]
       }

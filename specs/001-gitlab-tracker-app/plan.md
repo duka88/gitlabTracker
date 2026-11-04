@@ -22,7 +22,7 @@ It's built with Tauri 2:
 
 **Storage**: JSON files in the app data dir (`settings.json`, `state.json`, `notifications.json`), written atomically. Token in the macOS Keychain.
 
-**Testing**: `cargo test` (URL mapping, diff engine, merge-status derivation, notification text, persistence round-trip; GraphQL parsing against recorded fixtures); Vitest (formatters); manual checks in [quickstart.md](./quickstart.md) V1–V18.
+**Testing**: `cargo test` (URL mapping, diff engine, merge-status derivation, notification text, persistence round-trip; GraphQL parsing against recorded fixtures); Vitest (formatters); manual checks in [quickstart.md](./quickstart.md) V1–V27.
 
 **Target Platform**: macOS 13+ (Apple Silicon + Intel, universal binary)
 
@@ -50,7 +50,7 @@ It's built with Tauri 2:
 | IV. Read-only, quiet by default | Baseline on first load; each event notifies once | ✅ | ✅ Baselines, seen sets, visible-tab rule (data-model.md) |
 | V. Testable core | Pure functions with unit tests | ✅ | ✅ `url_map`, `diff`, `merge_status`, `notify_text` are pure; fixtures for parsing |
 | VI. Simplicity | One window and process, JSON files, minimal dependencies | ✅ | ✅ No Pinia or router; `tauri-nspanel` and `mac-notification-sys` deferred |
-| Constraint: GraphQL for lists | Both tab kinds use GraphQL | ✅ | ✅ Comments, merged check and mentions also use GraphQL |
+| Constraint: GraphQL for lists; REST only where GraphQL lacks data | Both tab kinds use GraphQL | ✅ | ✅ Comments, merged check, mentions and ticket lookup use GraphQL. REST only for commit ancestry in test-branch checks (`gitlab/branch_check.rs`, research R18), which GraphQL doesn't offer |
 
 There are no violations, so Complexity Tracking is empty.
 
@@ -109,11 +109,13 @@ src-tauri/
 │   ├── model/{settings.rs, tab.rs, item.rs, state.rs, notification.rs}
 │   ├── url_map.rs                     # parse_tab_url → TabQuery (pure)
 │   ├── gitlab/
-│   │   ├── client.rs                  # reqwest GraphQL client, error mapping
-│   │   ├── queries/*.graphql
+│   │   ├── client.rs                  # reqwest GraphQL client + rest_get (REST, FR-034), error mapping
+│   │   ├── queries/*.graphql          # incl. tickets_by_iid.graphql (FR-036b)
 │   │   ├── lists.rs                   # TabQuery → paged fetch → Vec<ListItem>
 │   │   ├── notes.rs, mentions.rs, merged.rs
-│   │   └── parse.rs                   # GraphQL JSON → ListItem (merge_status here)
+│   │   ├── branch_check.rs            # MRs on a test branch: ancestry via REST, cached (FR-034/037, R18)
+│   │   ├── tickets.rs                 # ticket lookup by branch number (FR-036b, R19)
+│   │   └── parse.rs                   # GraphQL JSON → ListItem (merge_status, linked ticket here)
 │   ├── engine/
 │   │   ├── poller.rs                  # interval, refresh Notify, in-flight guard
 │   │   ├── diff.rs                    # baseline/new/comment/change detection (pure)
@@ -126,7 +128,8 @@ src-tauri/
 └── tests/
     ├── fixtures/*.json                # recorded GraphQL responses
     ├── url_map_test.rs
-    ├── diff_test.rs
+    ├── diff_*_test.rs, merge_status_test.rs, tabs_test.rs
+    ├── branch_check_test.rs           # merge parsing/matching (FR-034)
     └── parse_test.rs
 ```
 
@@ -137,7 +140,7 @@ src-tauri/
 1. **GraphQL everywhere**: lists, notes, the merged check and mentions (R2, R6, R7). One page = 50 items; follow the cursor up to 500.
 2. **The poll pipeline** is strictly ordered: mentions → tabs → diff → comments → merged → visible-tab filter → count → persist → emit (data-model "Poll algorithm").
 3. **De-duplication** uses global gids, note ids, to-do ids and change keys in bounded seen sets that persist across restarts.
-4. **Two counters**: the menu bar count is distinct gids with markers outside the visible tab; the bell count is unread entries. Tab badges are per tab.
+4. **Two counters**: the menu bar count is distinct gids with markers outside the on-screen tab of the visible, focused window (FR-023a); the bell count is unread entries. Tab badges are per tab.
 5. **Notification clicks** route through the activation heuristic, with the bell popup as fallback (R9). `Notifier` is a trait, so a precise click handler can be swapped in later.
 6. **Wake handling**: a wall-clock watchdog triggers one refresh after sleep (R11).
 7. **Graceful degradation**: status filter retry (R3), sort fallback warning, the work-item comment-count fallback chain (R5), and the last good data kept on errors.

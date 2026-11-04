@@ -1,0 +1,20 @@
+# FR-036b: tickets looked up by number (branch-name convention) for MRs whose relations
+# don't include them (none linked, or beyond the first 10).
+query TicketsByIid($fullPath: ID!, $iids: [String!]) {
+  project(fullPath: $fullPath) {
+    workItems(iids: $iids, first: 100) {
+      nodes {
+        iid
+        reference(full: false)
+        title
+        webUrl
+        state
+        widgets {
+          __typename
+          ... on WorkItemWidgetStatus { status { name color } }
+          ... on WorkItemWidgetLabels { labels { nodes { title color textColor } } }
+        }
+      }
+    }
+  }
+}

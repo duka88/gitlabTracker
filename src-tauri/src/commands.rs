@@ -101,6 +101,31 @@ pub async fn set_interval(app: AppHandle, ctx: State<'_, AppCtx>, minutes: u8) -
     Ok(())
 }
 
+/// Sets the branch flagged on every MR (FR-037); empty clears it.
+#[tauri::command]
+pub async fn set_test_branch(
+    app: AppHandle,
+    ctx: State<'_, AppCtx>,
+    branch: Option<String>,
+) -> AppResult<()> {
+    if branch
+        .as_deref()
+        .is_some_and(|b| b.trim().chars().any(char::is_whitespace))
+    {
+        return Err(AppError::Invalid(
+            "A branch name can't contain spaces".into(),
+        ));
+    }
+    {
+        let mut c = ctx.core.lock().await;
+        c.settings.test_branch = crate::model::normalize_branch(branch);
+        c.save_settings();
+        emit_view(&app, &c);
+    }
+    ctx.poller.refresh();
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn set_notify_mentions(
     app: AppHandle,

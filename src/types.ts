@@ -10,6 +10,8 @@ export interface Tab {
   notifyNewItems: boolean;
   notifyNewComments: boolean;
   notifyChanges: boolean;
+  /** MR tabs: only MRs merged into this branch (FR-034). */
+  testBranch?: string | null;
 }
 
 export interface UserInfo {
@@ -48,6 +50,7 @@ export type PipelineStatus =
 
 export type MergeStatusTag =
   | "readyToMerge"
+  | "approved"
   | "needsApproval"
   | "ciFailed"
   | "conflicts"
@@ -65,6 +68,21 @@ export interface Reviewer extends Person {
   reviewState: string | null;
 }
 
+export interface LinkedTicket {
+  reference: string;
+  title: string;
+  webUrl: string;
+  open: boolean;
+  stateLabel: Label | null;
+  status: { name: string; color: string | null } | null;
+}
+
+export interface OnBranch {
+  branch: string;
+  upToDate: boolean;
+  mergedAt: string | null;
+}
+
 export interface MrFields {
   draft: boolean;
   targetBranch: string;
@@ -72,6 +90,10 @@ export interface MrFields {
   pipeline: PipelineStatus | null;
   approvals: Approvals;
   unresolvedThreads: number;
+  sourceBranch: string;
+  headSha: string;
+  onBranch: OnBranch | null;
+  ticket: LinkedTicket | null;
   reviewers: Reviewer[];
   mergeStatus: MergeStatusTag | null;
 }
@@ -148,6 +170,7 @@ export interface AppView {
   user: UserInfo | null;
   intervalMinutes: number;
   notifyMentions: boolean;
+  testBranch: string | null;
   polling: boolean;
   lastPollAt: string | null;
   activeTabId: string | null;

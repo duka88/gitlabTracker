@@ -1,0 +1,41 @@
+{
+  "data": {
+    "project": {
+      "workItems": {
+        "count": 1,
+        "pageInfo": { "hasNextPage": false, "endCursor": null },
+        "nodes": [
+          {
+            "id": "gid://gitlab/WorkItem/900",
+            "iid": "45",
+            "reference": "#45",
+            "title": "Synthetic task with every widget",
+            "confidential": true,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/x/-/work_items/45",
+            "createdAt": "2026-10-01T08:00:00Z",
+            "updatedAt": "2026-11-02T10:30:00Z",
+            "userDiscussionsCount": 7,
+            "namespace": { "fullPath": "login5/x" },
+            "workItemType": { "name": "Task", "iconName": "work-item-task" },
+            "author": { "username": "colleague1", "name": "Colleague 1", "avatarUrl": "https://secure.gravatar.com/avatar/abc?s=80&d=identicon" },
+            "widgets": [
+              { "__typename": "WorkItemWidgetAssignees", "assignees": { "nodes": [ { "username": "DusanJ88", "name": "Dusan Jankov", "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1" } ] } },
+              { "__typename": "WorkItemWidgetLabels", "labels": { "nodes": [ { "title": "state::In Development", "color": "#428bca", "textColor": "#FFFFFF" }, { "title": "Backend", "color": "#F0AD4E", "textColor": "#1F1E24" } ] } },
+              { "__typename": "WorkItemWidgetMilestone", "milestone": { "title": "5.23.x" } },
+              { "__typename": "WorkItemWidgetIteration", "iteration": { "title": null, "startDate": "2026-11-03", "dueDate": "2026-11-16", "iterationCadence": { "title": "Sprints" } } },
+              { "__typename": "WorkItemWidgetStartAndDueDate", "dueDate": "2026-11-10" },
+              { "__typename": "WorkItemWidgetWeight", "weight": 3 },
+              { "__typename": "WorkItemWidgetStatus", "status": { "name": "In progress", "color": "#1f75cb", "iconName": "status-running" } },
+              { "__typename": "WorkItemWidgetHealthStatus", "healthStatus": "needsAttention" },
+              { "__typename": "WorkItemWidgetAwardEmoji", "upvotes": 2, "downvotes": 1 },
+              { "__typename": "WorkItemWidgetDescription", "description": "Short **description**." },
+              { "__typename": "WorkItemWidgetHierarchy", "rolledUpCountsByType": [ { "countsByState": { "all": 3, "closed": 1 } }, { "countsByState": { "all": 2, "closed": 1 } } ] },
+              { "__typename": "WorkItemWidgetNotes" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

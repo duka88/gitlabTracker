@@ -1,0 +1,38 @@
+# GitLab Integration Extension Configuration
+# Read by the speckit-gitlab-issue command when creating issues for new features.
+
+# Numeric ID of the GitLab project that issues should be created against.
+# logineko-farming on gitlab.com — see logineko-docs/agents/gitlab.md.
+project_id: 14154118
+
+# MCP tool names. Override these to point at a different GitLab MCP server.
+# Defaults match the unofficial community GitLab MCP currently registered in
+# this repo (per memory `feedback_gitlab_mcp_choice`: use `mcp__gitlab__*`,
+# NOT `mcp__gitlab-fdl__*`). If the official `gitlab-org/mcp` (or another
+# server) is installed, override the two names below — the skill reads them
+# at runtime and calls those tools. Tool names follow Claude Code's
+# `mcp__<server>__<tool>` convention.
+mcp:
+  create_tool: mcp__gitlab__create_issue
+  get_tool: mcp__gitlab__get_issue
+
+# Labels added to every issue this extension creates. Keep these stable so
+# the SpecKit-created issues can be filtered in the GitLab UI. Uses the
+# `speckit-pilot` label that the rest of the SpecKit pilot work also carries.
+default_labels:
+  - speckit-pilot
+
+# Body for issues this extension creates. Keep it static: the issue IID — and
+# therefore the `<iid>-<slug>` branch and spec-dir names — is not known until
+# after the issue is created, so referencing them here would only ever render
+# literal placeholders.
+issue_body_template: |
+  Created via SpecKit (`speckit-specify`).
+
+# Behavior when the GitLab MCP cannot be reached:
+#   - "fail":   abort the speckit-specify run with a clear error
+#   - "skip":   continue with vanilla speckit-git-feature (sequential numbering)
+# The `optional: true` flag on the hook in `.specify/extensions.yml` is the
+# user-facing kill switch. This setting is the script-level default if the
+# user chooses to proceed past the optional prompt.
+on_mcp_unavailable: fail

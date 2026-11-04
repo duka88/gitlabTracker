@@ -1,0 +1,24 @@
+# Per-developer override for the SpecKit GitLab extension.
+# Copy this file to `gitlab-config.local.yml` (no `.example` suffix) and
+# edit. The `.local.yml` file is gitignored — your changes stay on your
+# machine and do not affect teammates.
+#
+# Only the keys you set here override the committed `gitlab-config.yml`.
+# Everything else falls through to the team default.
+#
+# Most common reason to use this file: your locally-registered GitLab MCP
+# server has different tool names from the team default. The example below
+# shows the override for the official `gitlab-org/mcp` server. Adjust to
+# match your locally-registered MCP server's tool names — check the MCP
+# server's docs or your Claude Code MCP config for the exact names.
+
+mcp:
+  create_tool: mcp__gitlab-official__createIssue
+  get_tool: mcp__gitlab-official__getIssue
+
+# You can also override other keys if you need to — for example a different
+# project_id for personal-sandbox testing, or skip behavior when MCP is
+# unavailable. Uncomment as needed:
+#
+# project_id: 99999999
+# on_mcp_unavailable: skip

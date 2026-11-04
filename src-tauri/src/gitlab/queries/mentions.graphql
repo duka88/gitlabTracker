@@ -1,0 +1,22 @@
+query Mentions {
+  currentUser {
+    todos(action: [mentioned, directly_addressed], state: [pending, done], first: 50, sort: CREATED_DESC) {
+      nodes {
+        id
+        action
+        body
+        createdAt
+        author { username name avatarUrl }
+        targetUrl
+        target {
+          __typename
+          webUrl
+          ... on MergeRequest { id iid reference }
+          ... on Issue { id iid reference }
+          ... on WorkItem { id iid reference }
+        }
+        note { id }
+      }
+    }
+  }
+}

@@ -1,0 +1,791 @@
+{
+  "data": {
+    "group": {
+      "workItems": {
+        "count": 5,
+        "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "eyJjcmVhdGVkX2F0IjoiMjAyNS0xMC0yMCAxMToyOToyOS4xMTEyNjkwMDAgKzAwMDAiLCJpZCI6IjE3NTU2NTgxMCJ9"
+        },
+        "nodes": [
+          {
+            "id": "gid://gitlab/WorkItem/208979070",
+            "iid": "19952",
+            "reference": "#19952",
+            "title": "Example item 12",
+            "confidential": false,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19952",
+            "createdAt": "2026-11-03T13:56:29Z",
+            "updatedAt": "2026-11-03T14:35:58Z",
+            "userDiscussionsCount": 0,
+            "namespace": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "workItemType": {
+              "name": "Issue",
+              "iconName": "work-item-issue"
+            },
+            "author": {
+              "username": "colleague10",
+              "name": "Colleague 10",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793717447"
+            },
+            "widgets": [
+              {
+                "__typename": "WorkItemWidgetAiSession"
+              },
+              {
+                "__typename": "WorkItemWidgetAssignees",
+                "assignees": {
+                  "nodes": [
+                    {
+                      "username": "DusanJ88",
+                      "name": "Dusan Jankov",
+                      "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetAwardEmoji",
+                "upvotes": 0,
+                "downvotes": 0
+              },
+              {
+                "__typename": "WorkItemWidgetCrmContacts"
+              },
+              {
+                "__typename": "WorkItemWidgetCurrentUserTodos"
+              },
+              {
+                "__typename": "WorkItemWidgetCustomFields"
+              },
+              {
+                "__typename": "WorkItemWidgetDescription",
+                "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n"
+              },
+              {
+                "__typename": "WorkItemWidgetDesigns"
+              },
+              {
+                "__typename": "WorkItemWidgetDevelopment"
+              },
+              {
+                "__typename": "WorkItemWidgetEmailParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetErrorTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetHierarchy",
+                "rolledUpCountsByType": [
+                  {
+                    "countsByState": {
+                      "all": 0,
+                      "closed": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "__typename": "WorkItemWidgetIteration",
+                "iteration": null
+              },
+              {
+                "__typename": "WorkItemWidgetLabels",
+                "labels": {
+                  "nodes": [
+                    {
+                      "title": "Resources::Warehouse::Web",
+                      "color": "#013220",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "priority::P3",
+                      "color": "#ff8080",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "severity::S3",
+                      "color": "#8E44AD",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "team::Warehouse",
+                      "color": "#6E49CB",
+                      "textColor": "#FFFFFF"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedItems"
+              },
+              {
+                "__typename": "WorkItemWidgetMilestone",
+                "milestone": null
+              },
+              {
+                "__typename": "WorkItemWidgetNotes"
+              },
+              {
+                "__typename": "WorkItemWidgetNotifications"
+              },
+              {
+                "__typename": "WorkItemWidgetParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetStartAndDueDate",
+                "dueDate": null
+              },
+              {
+                "__typename": "WorkItemWidgetTimeTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedResources"
+              },
+              {
+                "__typename": "WorkItemWidgetWeight",
+                "weight": null
+              },
+              {
+                "__typename": "WorkItemWidgetStatus",
+                "status": {
+                  "name": "To do",
+                  "color": "#737278",
+                  "iconName": "status-waiting"
+                }
+              }
+            ]
+          },
+          {
+            "id": "gid://gitlab/WorkItem/208979066",
+            "iid": "19951",
+            "reference": "#19951",
+            "title": "Example item 13",
+            "confidential": false,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19951",
+            "createdAt": "2026-11-03T13:56:27Z",
+            "updatedAt": "2026-11-03T14:34:56Z",
+            "userDiscussionsCount": 0,
+            "namespace": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "workItemType": {
+              "name": "Issue",
+              "iconName": "work-item-issue"
+            },
+            "author": {
+              "username": "colleague10",
+              "name": "Colleague 10",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793717447"
+            },
+            "widgets": [
+              {
+                "__typename": "WorkItemWidgetAiSession"
+              },
+              {
+                "__typename": "WorkItemWidgetAssignees",
+                "assignees": {
+                  "nodes": [
+                    {
+                      "username": "DusanJ88",
+                      "name": "Dusan Jankov",
+                      "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetAwardEmoji",
+                "upvotes": 0,
+                "downvotes": 0
+              },
+              {
+                "__typename": "WorkItemWidgetCrmContacts"
+              },
+              {
+                "__typename": "WorkItemWidgetCurrentUserTodos"
+              },
+              {
+                "__typename": "WorkItemWidgetCustomFields"
+              },
+              {
+                "__typename": "WorkItemWidgetDescription",
+                "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n"
+              },
+              {
+                "__typename": "WorkItemWidgetDesigns"
+              },
+              {
+                "__typename": "WorkItemWidgetDevelopment"
+              },
+              {
+                "__typename": "WorkItemWidgetEmailParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetErrorTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetHierarchy",
+                "rolledUpCountsByType": [
+                  {
+                    "countsByState": {
+                      "all": 0,
+                      "closed": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "__typename": "WorkItemWidgetIteration",
+                "iteration": null
+              },
+              {
+                "__typename": "WorkItemWidgetLabels",
+                "labels": {
+                  "nodes": [
+                    {
+                      "title": "Resources::Warehouse::Web",
+                      "color": "#013220",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "priority::P3",
+                      "color": "#ff8080",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "severity::S3",
+                      "color": "#8E44AD",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "team::Warehouse",
+                      "color": "#6E49CB",
+                      "textColor": "#FFFFFF"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedItems"
+              },
+              {
+                "__typename": "WorkItemWidgetMilestone",
+                "milestone": null
+              },
+              {
+                "__typename": "WorkItemWidgetNotes"
+              },
+              {
+                "__typename": "WorkItemWidgetNotifications"
+              },
+              {
+                "__typename": "WorkItemWidgetParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetStartAndDueDate",
+                "dueDate": null
+              },
+              {
+                "__typename": "WorkItemWidgetTimeTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedResources"
+              },
+              {
+                "__typename": "WorkItemWidgetWeight",
+                "weight": null
+              },
+              {
+                "__typename": "WorkItemWidgetStatus",
+                "status": {
+                  "name": "To do",
+                  "color": "#737278",
+                  "iconName": "status-waiting"
+                }
+              }
+            ]
+          },
+          {
+            "id": "gid://gitlab/WorkItem/208950233",
+            "iid": "19928",
+            "reference": "#19928",
+            "title": "Example item 14",
+            "confidential": false,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19928",
+            "createdAt": "2026-11-03T10:30:55Z",
+            "updatedAt": "2026-11-03T10:35:58Z",
+            "userDiscussionsCount": 0,
+            "namespace": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "workItemType": {
+              "name": "Issue",
+              "iconName": "work-item-issue"
+            },
+            "author": {
+              "username": "colleague9",
+              "name": "Colleague 9",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+            },
+            "widgets": [
+              {
+                "__typename": "WorkItemWidgetAiSession"
+              },
+              {
+                "__typename": "WorkItemWidgetAssignees",
+                "assignees": {
+                  "nodes": [
+                    {
+                      "username": "colleague9",
+                      "name": "Colleague 9",
+                      "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+                    },
+                    {
+                      "username": "DusanJ88",
+                      "name": "Dusan Jankov",
+                      "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetAwardEmoji",
+                "upvotes": 0,
+                "downvotes": 0
+              },
+              {
+                "__typename": "WorkItemWidgetCrmContacts"
+              },
+              {
+                "__typename": "WorkItemWidgetCurrentUserTodos"
+              },
+              {
+                "__typename": "WorkItemWidgetCustomFields"
+              },
+              {
+                "__typename": "WorkItemWidgetDescription",
+                "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n"
+              },
+              {
+                "__typename": "WorkItemWidgetDesigns"
+              },
+              {
+                "__typename": "WorkItemWidgetDevelopment"
+              },
+              {
+                "__typename": "WorkItemWidgetEmailParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetErrorTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetHierarchy",
+                "rolledUpCountsByType": [
+                  {
+                    "countsByState": {
+                      "all": 0,
+                      "closed": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "__typename": "WorkItemWidgetIteration",
+                "iteration": null
+              },
+              {
+                "__typename": "WorkItemWidgetLabels",
+                "labels": {
+                  "nodes": [
+                    {
+                      "title": "E2E::*",
+                      "color": "#330066",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "Resources::Warehouse::Web",
+                      "color": "#013220",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "priority::P4",
+                      "color": "#ffc2c2",
+                      "textColor": "#1F1E24"
+                    },
+                    {
+                      "title": "severity::S4",
+                      "color": "#8E44AD",
+                      "textColor": "#FFFFFF"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedItems"
+              },
+              {
+                "__typename": "WorkItemWidgetMilestone",
+                "milestone": {
+                  "title": "5.23.x"
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetNotes"
+              },
+              {
+                "__typename": "WorkItemWidgetNotifications"
+              },
+              {
+                "__typename": "WorkItemWidgetParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetStartAndDueDate",
+                "dueDate": null
+              },
+              {
+                "__typename": "WorkItemWidgetTimeTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedResources"
+              },
+              {
+                "__typename": "WorkItemWidgetWeight",
+                "weight": null
+              },
+              {
+                "__typename": "WorkItemWidgetStatus",
+                "status": {
+                  "name": "To do",
+                  "color": "#737278",
+                  "iconName": "status-waiting"
+                }
+              }
+            ]
+          },
+          {
+            "id": "gid://gitlab/WorkItem/207104786",
+            "iid": "19192",
+            "reference": "#19192",
+            "title": "Example item 15",
+            "confidential": false,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19192",
+            "createdAt": "2026-10-19T06:06:06Z",
+            "updatedAt": "2026-10-20T07:09:04Z",
+            "userDiscussionsCount": 0,
+            "namespace": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "workItemType": {
+              "name": "Issue",
+              "iconName": "work-item-issue"
+            },
+            "author": {
+              "username": "colleague9",
+              "name": "Colleague 9",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+            },
+            "widgets": [
+              {
+                "__typename": "WorkItemWidgetAiSession"
+              },
+              {
+                "__typename": "WorkItemWidgetAssignees",
+                "assignees": {
+                  "nodes": [
+                    {
+                      "username": "DusanJ88",
+                      "name": "Dusan Jankov",
+                      "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetAwardEmoji",
+                "upvotes": 0,
+                "downvotes": 0
+              },
+              {
+                "__typename": "WorkItemWidgetCrmContacts"
+              },
+              {
+                "__typename": "WorkItemWidgetCurrentUserTodos"
+              },
+              {
+                "__typename": "WorkItemWidgetCustomFields"
+              },
+              {
+                "__typename": "WorkItemWidgetDescription",
+                "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n"
+              },
+              {
+                "__typename": "WorkItemWidgetDesigns"
+              },
+              {
+                "__typename": "WorkItemWidgetDevelopment"
+              },
+              {
+                "__typename": "WorkItemWidgetEmailParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetErrorTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetHierarchy",
+                "rolledUpCountsByType": [
+                  {
+                    "countsByState": {
+                      "all": 0,
+                      "closed": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "__typename": "WorkItemWidgetIteration",
+                "iteration": null
+              },
+              {
+                "__typename": "WorkItemWidgetLabels",
+                "labels": {
+                  "nodes": [
+                    {
+                      "title": "E2E::*",
+                      "color": "#330066",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "priority::P3",
+                      "color": "#ff8080",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "severity::S3",
+                      "color": "#8E44AD",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "team::Warehouse",
+                      "color": "#6E49CB",
+                      "textColor": "#FFFFFF"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedItems"
+              },
+              {
+                "__typename": "WorkItemWidgetMilestone",
+                "milestone": {
+                  "title": "5.20.x"
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetNotes"
+              },
+              {
+                "__typename": "WorkItemWidgetNotifications"
+              },
+              {
+                "__typename": "WorkItemWidgetParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetStartAndDueDate",
+                "dueDate": null
+              },
+              {
+                "__typename": "WorkItemWidgetTimeTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedResources"
+              },
+              {
+                "__typename": "WorkItemWidgetWeight",
+                "weight": null
+              },
+              {
+                "__typename": "WorkItemWidgetStatus",
+                "status": {
+                  "name": "To do",
+                  "color": "#737278",
+                  "iconName": "status-waiting"
+                }
+              }
+            ]
+          },
+          {
+            "id": "gid://gitlab/WorkItem/206253054",
+            "iid": "18916",
+            "reference": "#18916",
+            "title": "Example item 16",
+            "confidential": false,
+            "state": "OPEN",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/18916",
+            "createdAt": "2026-10-12T09:22:58Z",
+            "updatedAt": "2026-10-12T09:42:20Z",
+            "userDiscussionsCount": 0,
+            "namespace": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "workItemType": {
+              "name": "Issue",
+              "iconName": "work-item-issue"
+            },
+            "author": {
+              "username": "colleague9",
+              "name": "Colleague 9",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+            },
+            "widgets": [
+              {
+                "__typename": "WorkItemWidgetAiSession"
+              },
+              {
+                "__typename": "WorkItemWidgetAssignees",
+                "assignees": {
+                  "nodes": [
+                    {
+                      "username": "colleague9",
+                      "name": "Colleague 9",
+                      "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+                    },
+                    {
+                      "username": "DusanJ88",
+                      "name": "Dusan Jankov",
+                      "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetAwardEmoji",
+                "upvotes": 0,
+                "downvotes": 0
+              },
+              {
+                "__typename": "WorkItemWidgetCrmContacts"
+              },
+              {
+                "__typename": "WorkItemWidgetCurrentUserTodos"
+              },
+              {
+                "__typename": "WorkItemWidgetCustomFields"
+              },
+              {
+                "__typename": "WorkItemWidgetDescription",
+                "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n"
+              },
+              {
+                "__typename": "WorkItemWidgetDesigns"
+              },
+              {
+                "__typename": "WorkItemWidgetDevelopment"
+              },
+              {
+                "__typename": "WorkItemWidgetEmailParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetErrorTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetHierarchy",
+                "rolledUpCountsByType": [
+                  {
+                    "countsByState": {
+                      "all": 0,
+                      "closed": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "__typename": "WorkItemWidgetIteration",
+                "iteration": null
+              },
+              {
+                "__typename": "WorkItemWidgetLabels",
+                "labels": {
+                  "nodes": [
+                    {
+                      "title": "E2E::*",
+                      "color": "#330066",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "Resources::Warehouse::Web",
+                      "color": "#013220",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "priority::P4",
+                      "color": "#ffc2c2",
+                      "textColor": "#1F1E24"
+                    },
+                    {
+                      "title": "severity::S4",
+                      "color": "#8E44AD",
+                      "textColor": "#FFFFFF"
+                    },
+                    {
+                      "title": "team::Warehouse",
+                      "color": "#6E49CB",
+                      "textColor": "#FFFFFF"
+                    }
+                  ]
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedItems"
+              },
+              {
+                "__typename": "WorkItemWidgetMilestone",
+                "milestone": {
+                  "title": "5.19.x"
+                }
+              },
+              {
+                "__typename": "WorkItemWidgetNotes"
+              },
+              {
+                "__typename": "WorkItemWidgetNotifications"
+              },
+              {
+                "__typename": "WorkItemWidgetParticipants"
+              },
+              {
+                "__typename": "WorkItemWidgetStartAndDueDate",
+                "dueDate": null
+              },
+              {
+                "__typename": "WorkItemWidgetTimeTracking"
+              },
+              {
+                "__typename": "WorkItemWidgetLinkedResources"
+              },
+              {
+                "__typename": "WorkItemWidgetWeight",
+                "weight": null
+              },
+              {
+                "__typename": "WorkItemWidgetStatus",
+                "status": {
+                  "name": "To do",
+                  "color": "#737278",
+                  "iconName": "status-waiting"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+# One query, three relations: exactly one of $authored / $reviewing / $assigned is true.
+# Each connection rejects the filter for its own relation, so those are passed per relation.
+query DashboardMRs(
+  $username: String!
+  $authored: Boolean!
+  $reviewing: Boolean!
+  $assigned: Boolean!
+  $authorUsername: String
+  $assigneeUsername: String
+  $reviewerUsername: String
+  $state: MergeRequestState, $labels: [String!], $milestoneTitle: String, $not: MergeRequestsResolverNegatedParams, $draft: Boolean, $search: String, $sort: MergeRequestSort, $after: String
+) {
+  user(username: $username) {
+    authored: authoredMergeRequests(first: 50, after: $after, state: $state, labels: $labels, milestoneTitle: $milestoneTitle, not: $not, draft: $draft, search: $search, sort: $sort, assigneeUsername: $assigneeUsername, reviewerUsername: $reviewerUsername) @include(if: $authored) { ...MrPage }
+    reviewing: reviewRequestedMergeRequests(first: 50, after: $after, state: $state, labels: $labels, milestoneTitle: $milestoneTitle, not: $not, draft: $draft, search: $search, sort: $sort, authorUsername: $authorUsername, assigneeUsername: $assigneeUsername) @include(if: $reviewing) { ...MrPage }
+    assigned: assignedMergeRequests(first: 50, after: $after, state: $state, labels: $labels, milestoneTitle: $milestoneTitle, not: $not, draft: $draft, search: $search, sort: $sort, authorUsername: $authorUsername, reviewerUsername: $reviewerUsername) @include(if: $assigned) { ...MrPage }
+  }
+}
+
+fragment MrFields on MergeRequest {
+  id
+  iid
+  reference(full: false)
+  title
+  draft
+  state
+  webUrl
+  createdAt
+  updatedAt
+  targetBranch
+  description
+  userNotesCount
+  upvotes
+  downvotes
+  conflicts
+  detailedMergeStatus
+  approved
+  approvalsRequired
+  approvalsLeft
+  approvedBy(first: 20) { nodes { username } }
+  resolvableDiscussionsCount
+  resolvedDiscussionsCount
+  project { fullPath }
+  author { username name avatarUrl }
+  milestone { title }
+  headPipeline { status }
+  labels(first: 20) { nodes { title color textColor } }
+  assignees(first: 10) { nodes { username name avatarUrl } }
+  reviewers(first: 10) {
+    nodes { username name avatarUrl mergeRequestInteraction { approved reviewState } }
+  }
+}
+
+fragment MrPage on MergeRequestConnection {
+  count
+  pageInfo { hasNextPage endCursor }
+  nodes { ...MrFields }
+}

@@ -1,0 +1,191 @@
+// Mirrors the Rust view types in src-tauri/src/model (serde camelCase).
+
+export type ListKind = "mergeRequests" | "workItems";
+
+export interface Tab {
+  id: string;
+  name: string;
+  url: string;
+  kind: ListKind;
+  notifyNewItems: boolean;
+  notifyNewComments: boolean;
+  notifyChanges: boolean;
+}
+
+export interface UserInfo {
+  id: string;
+  username: string;
+  name: string;
+  avatarUrl: string | null;
+}
+
+export interface Person {
+  username: string;
+  name: string;
+  /** `avatar://localhost/...` proxy URL; never a GitLab URL. */
+  avatarUrl: string | null;
+}
+
+export interface Label {
+  title: string;
+  color: string;
+  textColor: string;
+  scope: string | null;
+  value: string;
+}
+
+export type PipelineStatus =
+  | "success"
+  | "failed"
+  | "running"
+  | "pending"
+  | "canceled"
+  | "skipped"
+  | "manual"
+  | "created"
+  | "scheduled"
+  | "other";
+
+export type MergeStatusTag =
+  | "readyToMerge"
+  | "needsApproval"
+  | "ciFailed"
+  | "conflicts"
+  | "changesRequested"
+  | "unresolvedThreads";
+
+export interface Approvals {
+  approved: boolean;
+  required: number;
+  given: number;
+}
+
+export interface Reviewer extends Person {
+  approved: boolean;
+  reviewState: string | null;
+}
+
+export interface MrFields {
+  draft: boolean;
+  targetBranch: string;
+  state: string;
+  pipeline: PipelineStatus | null;
+  approvals: Approvals;
+  unresolvedThreads: number;
+  reviewers: Reviewer[];
+  mergeStatus: MergeStatusTag | null;
+}
+
+export type Health = "onTrack" | "needsAttention" | "atRisk";
+
+export interface WorkItemFields {
+  typeName: string;
+  typeIcon: string | null;
+  confidential: boolean;
+  iteration: string | null;
+  /** `YYYY-MM-DD` */
+  dueDate: string | null;
+  weight: number | null;
+  status: { name: string; color: string | null } | null;
+  health: Health | null;
+  children: { done: number; total: number } | null;
+}
+
+export interface ListItem {
+  gid: string;
+  kind: ListKind;
+  iid: string;
+  reference: string;
+  title: string;
+  webUrl: string;
+  projectPath: string;
+  author: Person | null;
+  createdAt: string;
+  updatedAt: string;
+  labels: Label[];
+  assignees: Person[];
+  milestone: string | null;
+  commentCount: number | null;
+  upvotes: number;
+  downvotes: number;
+  descriptionPreview: string;
+  mr?: MrFields;
+  workItem?: WorkItemFields;
+}
+
+export type ChangeKind =
+  | { type: "pipelineFailed" }
+  | { type: "approved" }
+  | { type: "changesRequested"; byUsername: string; byName: string }
+  | { type: "merged" }
+  | { type: "statusChanged"; from: string | null; to: string | null }
+  | { type: "labelsChanged"; added: string[]; removed: string[] };
+
+/** Also the wire form of `AppError`. */
+export interface Issue {
+  kind: string;
+  message: string;
+}
+export type AppError = Issue;
+
+export interface TabView {
+  tab: Tab;
+  items: ListItem[];
+  itemCount: number;
+  newCount: number;
+  newItems: string[];
+  newComments: Record<string, number>;
+  changes: Record<string, ChangeKind[]>;
+  error: Issue | null;
+  warning: Issue | null;
+  truncatedTotal: number | null;
+  lastUpdated: string | null;
+  loaded: boolean;
+}
+
+export interface AppView {
+  signedIn: boolean;
+  user: UserInfo | null;
+  intervalMinutes: number;
+  notifyMentions: boolean;
+  polling: boolean;
+  lastPollAt: string | null;
+  activeTabId: string | null;
+  tabs: TabView[];
+  menuCount: number;
+  bellUnread: number;
+  globalError: Issue | null;
+}
+
+export type NotificationKind = "newItem" | "newItems" | "comment" | "change" | "mention";
+
+export interface NotificationEntry {
+  id: string;
+  kind: NotificationKind;
+  tabId: string | null;
+  itemGid: string | null;
+  webUrl: string | null;
+  text: string;
+  createdAt: string;
+  read: boolean;
+}
+
+export interface UrlCheck {
+  valid: boolean;
+  kind: ListKind | null;
+  scopeLabel: string | null;
+  filtersSummary: string[];
+  ignoredParams: string[];
+  error: string | null;
+}
+
+export type OpenTarget =
+  | { type: "row"; tabId: string; gid: string }
+  | { type: "tab"; tabId: string }
+  | { type: "browser" }
+  | { type: "none" };
+
+export interface RowTarget {
+  tabId: string;
+  gid: string;
+}

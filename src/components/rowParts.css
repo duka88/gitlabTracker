@@ -1,0 +1,111 @@
+/* Shared layout for MrRow and WorkItemRow (imported scoped by each). */
+.grid {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+.main {
+  flex: 1;
+  min-width: 0;
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  max-width: 45%;
+}
+.side-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.title-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.meta {
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 5px;
+}
+.meta .sep::before {
+  content: "·";
+  color: var(--text-faint);
+}
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.labels {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.tag {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  line-height: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag.new {
+  background: var(--orange-strong);
+  color: var(--on-orange);
+}
+.tag.changed {
+  background: var(--orange-bg);
+  color: var(--orange);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tag.draft {
+  background: var(--bg-strong);
+  color: var(--text-muted);
+}
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.count.hot {
+  color: var(--orange-strong);
+  font-weight: 600;
+}
+.count.unresolved {
+  color: var(--orange-strong);
+}
+.updated {
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.overdue {
+  color: var(--red);
+  font-weight: 600;
+}

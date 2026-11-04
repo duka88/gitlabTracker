@@ -1,0 +1,97 @@
+{
+  "data": {
+    "n0": {
+      "widgets": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+          "notes": {
+            "nodes": [
+              {
+                "id": "gid://gitlab/DiscussionNote/4117142040",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-10-29T14:10:25Z",
+                "author": {
+                  "username": "colleague11",
+                  "name": "Colleague 11"
+                }
+              },
+              {
+                "id": "gid://gitlab/DiscussionNote/4117287576",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-10-29T14:27:35Z",
+                "author": {
+                  "username": "colleague11",
+                  "name": "Colleague 11"
+                }
+              },
+              {
+                "id": "gid://gitlab/DiscussionNote/4124144687",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-10-30T11:22:37Z",
+                "author": {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov"
+                }
+              },
+              {
+                "id": "gid://gitlab/DiscussionNote/4141988165",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-11-02T15:46:09Z",
+                "author": {
+                  "username": "colleague12",
+                  "name": "Colleague 12"
+                }
+              },
+              {
+                "id": "gid://gitlab/Note/4144671114",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-11-02T20:47:28Z",
+                "author": {
+                  "username": "colleague10",
+                  "name": "Colleague 10"
+                }
+              },
+              {
+                "id": "gid://gitlab/DiscussionNote/4151976943",
+                "body": "Looks good, one small question about the `retry` logic in this change.",
+                "system": false,
+                "createdAt": "2026-11-03T15:47:13Z",
+                "author": {
+                  "username": "colleague12",
+                  "name": "Colleague 12"
+                }
+              }
+            ]
+          }
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    }
+  }
+}

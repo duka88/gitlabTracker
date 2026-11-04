@@ -1,0 +1,40 @@
+schema_version: "1.0"
+
+extension:
+  id: gitlab
+  name: "GitLab Issue Integration"
+  version: "0.1.1"
+  description: "Create a real GitLab issue before the SpecKit feature branch so the branch inherits the issue ID instead of an auto-derived sequential number; the spec folder follows on a best-effort basis."
+  author: logineko
+  license: MIT
+
+requires:
+  speckit_version: ">=0.8.0"
+  tools:
+    - name: mcp__gitlab
+      required: true
+      description: "GitLab MCP server with create_issue access to the configured project_id"
+
+provides:
+  commands:
+    - name: speckit.gitlab.issue
+      file: commands/speckit.gitlab.issue.md
+      description: "Create a GitLab issue and prepare GIT_BRANCH_NAME for the next hook (plus best-effort SPECIFY_FEATURE_DIRECTORY for speckit-specify)"
+
+  config:
+    - name: "gitlab-config.yml"
+      template: "gitlab-config.yml"
+      description: "GitLab project ID, default labels, and behavior on MCP unavailability"
+      required: true
+
+hooks:
+  before_specify:
+    command: speckit.gitlab.issue
+    optional: true
+    prompt: "Create a GitLab issue first (branch inherits its ID; spec folder best-effort)?"
+    description: "Create a real GitLab issue and hand its ID to speckit.git.feature via GIT_BRANCH_NAME (and, best-effort, to speckit-specify via SPECIFY_FEATURE_DIRECTORY)"
+
+tags:
+  - "gitlab"
+  - "issue-tracker"
+  - "logineko"

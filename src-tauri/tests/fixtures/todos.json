@@ -1,0 +1,120 @@
+{
+  "data": {
+    "currentUser": {
+      "todos": {
+        "nodes": [
+          {
+            "id": "gid://gitlab/Todo/798929094",
+            "action": "directly_addressed",
+            "body": "@DusanJ88 could you take a **look** at this? See `config.rs` for details.",
+            "createdAt": "2026-11-03T15:40:33Z",
+            "author": {
+              "username": "colleague12",
+              "name": "Colleague 12",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793690964"
+            },
+            "targetUrl": "https://gitlab.com/login5/login-eko/sandbox/logineko-product-specs/-/merge_requests/19#note_4151915150",
+            "target": {
+              "__typename": "MergeRequest",
+              "webUrl": "https://gitlab.com/login5/login-eko/sandbox/logineko-product-specs/-/merge_requests/19",
+              "id": "gid://gitlab/MergeRequest/546920278",
+              "iid": "19",
+              "reference": "!19"
+            },
+            "note": {
+              "id": "gid://gitlab/DiscussionNote/4151915150"
+            }
+          },
+          {
+            "id": "gid://gitlab/Todo/798869833",
+            "action": "directly_addressed",
+            "body": "@DusanJ88 could you take a **look** at this? See `config.rs` for details.",
+            "createdAt": "2026-11-03T14:43:04Z",
+            "author": {
+              "username": "colleague10",
+              "name": "Colleague 10",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793717447"
+            },
+            "targetUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/18924#note_4151345116",
+            "target": {
+              "__typename": "Issue",
+              "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/18924",
+              "id": "gid://gitlab/Issue/206280386",
+              "iid": "18924",
+              "reference": "#18924"
+            },
+            "note": {
+              "id": "gid://gitlab/Note/4151345116"
+            }
+          },
+          {
+            "id": "gid://gitlab/Todo/798828175",
+            "action": "directly_addressed",
+            "body": "@DusanJ88 could you take a **look** at this? See `config.rs` for details.",
+            "createdAt": "2026-11-03T14:04:35Z",
+            "author": {
+              "username": "colleague12",
+              "name": "Colleague 12",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793690964"
+            },
+            "targetUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/18059#note_4150939478",
+            "target": {
+              "__typename": "MergeRequest",
+              "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/18059",
+              "id": "gid://gitlab/MergeRequest/538281761",
+              "iid": "18059",
+              "reference": "!18059"
+            },
+            "note": {
+              "id": "gid://gitlab/DiscussionNote/4150939478"
+            }
+          },
+          {
+            "id": "gid://gitlab/Todo/798574681",
+            "action": "directly_addressed",
+            "body": "@DusanJ88 could you take a **look** at this? See `config.rs` for details.",
+            "createdAt": "2026-11-03T09:29:39Z",
+            "author": {
+              "username": "colleague9",
+              "name": "Colleague 9",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+            },
+            "targetUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19852#note_4148584586",
+            "target": {
+              "__typename": "Issue",
+              "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19852",
+              "id": "gid://gitlab/Issue/208820549",
+              "iid": "19852",
+              "reference": "#19852"
+            },
+            "note": {
+              "id": "gid://gitlab/Note/4148584586"
+            }
+          },
+          {
+            "id": "gid://gitlab/Todo/798513847",
+            "action": "directly_addressed",
+            "body": "@DusanJ88 could you take a **look** at this? See `config.rs` for details.",
+            "createdAt": "2026-11-03T08:12:52Z",
+            "author": {
+              "username": "colleague9",
+              "name": "Colleague 9",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731"
+            },
+            "targetUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19852#note_4148041272",
+            "target": {
+              "__typename": "Issue",
+              "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/work_items/19852",
+              "id": "gid://gitlab/Issue/208820549",
+              "iid": "19852",
+              "reference": "#19852"
+            },
+            "note": {
+              "id": "gid://gitlab/Note/4148041272"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

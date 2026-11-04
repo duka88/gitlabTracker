@@ -1,0 +1,51 @@
+query ProjectMRs(
+  $fullPath: ID!
+  $authorUsername: String
+  $assigneeUsername: String
+  $reviewerUsername: String
+  $state: MergeRequestState, $labels: [String!], $milestoneTitle: String, $not: MergeRequestsResolverNegatedParams, $draft: Boolean, $search: String, $sort: MergeRequestSort, $after: String
+) {
+  project(fullPath: $fullPath) {
+    mergeRequests(first: 50, after: $after, state: $state, labels: $labels, milestoneTitle: $milestoneTitle, not: $not, draft: $draft, search: $search, sort: $sort, authorUsername: $authorUsername, assigneeUsername: $assigneeUsername, reviewerUsername: $reviewerUsername) { ...MrPage }
+  }
+}
+
+fragment MrFields on MergeRequest {
+  id
+  iid
+  reference(full: false)
+  title
+  draft
+  state
+  webUrl
+  createdAt
+  updatedAt
+  targetBranch
+  description
+  userNotesCount
+  upvotes
+  downvotes
+  conflicts
+  detailedMergeStatus
+  approved
+  approvalsRequired
+  approvalsLeft
+  approvedBy(first: 20) { nodes { username } }
+  resolvableDiscussionsCount
+  resolvedDiscussionsCount
+  project { fullPath }
+  author { username name avatarUrl }
+  milestone { title }
+  headPipeline { status }
+  labels(first: 20) { nodes { title color textColor } }
+  assignees(first: 10) { nodes { username name avatarUrl } }
+  reviewers(first: 10) {
+    nodes { username name avatarUrl mergeRequestInteraction { approved reviewState } }
+  }
+}
+
+fragment MrPage on MergeRequestConnection {
+  count
+  pageInfo { hasNextPage endCursor }
+  nodes { ...MrFields }
+}

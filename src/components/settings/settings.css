@@ -1,0 +1,38 @@
+.card {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+h2 {
+  margin: 0 0 8px;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+p {
+  margin: 0 0 8px;
+}
+.row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.err {
+  color: var(--red);
+  font-size: var(--fs-sm);
+  margin: 6px 0 0;
+}
+.link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--blue);
+}
+.link:hover:not(:disabled) {
+  background: transparent;
+  text-decoration: underline;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}

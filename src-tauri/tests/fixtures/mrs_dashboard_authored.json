@@ -1,0 +1,447 @@
+{
+  "data": {
+    "user": {
+      "authored": {
+        "count": 5,
+        "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "eyJjcmVhdGVkX2F0IjoiMjAyNi0wNi0xOSAxNjowMjozNi4xODc4MjMwMDAgKzAwMDAiLCJpZCI6IjQ5Nzg2OTAzMyJ9"
+        },
+        "nodes": [
+          {
+            "id": "gid://gitlab/MergeRequest/560867721",
+            "iid": "19717",
+            "reference": "!19717",
+            "title": "Example item 5",
+            "draft": false,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/19717",
+            "createdAt": "2026-11-03T11:01:17Z",
+            "updatedAt": "2026-11-03T12:42:00Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 0,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": false,
+            "detailedMergeStatus": "MERGEABLE",
+            "approved": true,
+            "approvalsRequired": 1,
+            "approvalsLeft": 0,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "DusanJ88",
+              "name": "Dusan Jankov",
+              "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": [
+                {
+                  "title": "Infrastructure::UserManagement",
+                  "color": "#eee600",
+                  "textColor": "#1F1E24"
+                },
+                {
+                  "title": "priority::P3",
+                  "color": "#ff8080",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "state::In Development",
+                  "color": "#428bca",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "team::Warehouse",
+                  "color": "#6E49CB",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "type::Improvement",
+                  "color": "#7F8C8D",
+                  "textColor": "#FFFFFF"
+                }
+              ]
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov",
+                  "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": [
+                {
+                  "username": "colleague1",
+                  "name": "Colleague 1",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793727940",
+                  "mergeRequestInteraction": {
+                    "approved": true,
+                    "reviewState": "APPROVED"
+                  }
+                }
+              ]
+            },
+            "approvedBy": {
+              "nodes": [
+                {
+                  "username": "approver1"
+                }
+              ]
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          },
+          {
+            "id": "gid://gitlab/MergeRequest/557869017",
+            "iid": "19473",
+            "reference": "!19473",
+            "title": "Draft: Example item 6",
+            "draft": true,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/19473",
+            "createdAt": "2026-10-29T11:20:11Z",
+            "updatedAt": "2026-10-30T13:33:28Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 13,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": true,
+            "detailedMergeStatus": "DRAFT_STATUS",
+            "approved": true,
+            "approvalsRequired": 1,
+            "approvalsLeft": 0,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "DusanJ88",
+              "name": "Dusan Jankov",
+              "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": [
+                {
+                  "title": "Resources::Warehouse::Web",
+                  "color": "#013220",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "priority::P3",
+                  "color": "#ff8080",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "severity::S3",
+                  "color": "#8E44AD",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "state::In Development",
+                  "color": "#428bca",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "team::Warehouse",
+                  "color": "#6E49CB",
+                  "textColor": "#FFFFFF"
+                }
+              ]
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov",
+                  "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": [
+                {
+                  "username": "colleague1",
+                  "name": "Colleague 1",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793727940",
+                  "mergeRequestInteraction": {
+                    "approved": true,
+                    "reviewState": "APPROVED"
+                  }
+                }
+              ]
+            },
+            "approvedBy": {
+              "nodes": [
+                {
+                  "username": "approver1"
+                }
+              ]
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          },
+          {
+            "id": "gid://gitlab/MergeRequest/557781016",
+            "iid": "19443",
+            "reference": "!19443",
+            "title": "Example item 7",
+            "draft": false,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/19443",
+            "createdAt": "2026-10-29T09:02:51Z",
+            "updatedAt": "2026-10-29T10:53:18Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 6,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": true,
+            "detailedMergeStatus": "CONFLICT",
+            "approved": true,
+            "approvalsRequired": 1,
+            "approvalsLeft": 0,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "DusanJ88",
+              "name": "Dusan Jankov",
+              "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": [
+                {
+                  "title": "Frontend",
+                  "color": "#6699cc",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "Resources::Warehouse::Web",
+                  "color": "#013220",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "priority::P3",
+                  "color": "#ff8080",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "state::In Development",
+                  "color": "#428bca",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "type::Improvement",
+                  "color": "#7F8C8D",
+                  "textColor": "#FFFFFF"
+                }
+              ]
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov",
+                  "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": [
+                {
+                  "username": "colleague1",
+                  "name": "Colleague 1",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793727940",
+                  "mergeRequestInteraction": {
+                    "approved": true,
+                    "reviewState": "APPROVED"
+                  }
+                }
+              ]
+            },
+            "approvedBy": {
+              "nodes": [
+                {
+                  "username": "approver1"
+                }
+              ]
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          },
+          {
+            "id": "gid://gitlab/MergeRequest/538281761",
+            "iid": "18059",
+            "reference": "!18059",
+            "title": "Example item 8",
+            "draft": false,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/18059",
+            "createdAt": "2026-09-25T08:46:58Z",
+            "updatedAt": "2026-11-03T15:12:20Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 772,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": true,
+            "detailedMergeStatus": "NOT_APPROVED",
+            "approved": false,
+            "approvalsRequired": 1,
+            "approvalsLeft": 1,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "DusanJ88",
+              "name": "Dusan Jankov",
+              "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+            },
+            "milestone": {
+              "title": "5.18.x"
+            },
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": [
+                {
+                  "title": "Product",
+                  "color": "#9400d3",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "Resources::Warehouse::Web",
+                  "color": "#013220",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "priority::P2",
+                  "color": "#ff5e5e",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "state::In Development",
+                  "color": "#428bca",
+                  "textColor": "#FFFFFF"
+                },
+                {
+                  "title": "team::Warehouse",
+                  "color": "#6E49CB",
+                  "textColor": "#FFFFFF"
+                }
+              ]
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov",
+                  "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": [
+                {
+                  "username": "colleague1",
+                  "name": "Colleague 1",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793727940",
+                  "mergeRequestInteraction": {
+                    "approved": false,
+                    "reviewState": "UNREVIEWED"
+                  }
+                },
+                {
+                  "username": "colleague6",
+                  "name": "Colleague 6",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793691035",
+                  "mergeRequestInteraction": {
+                    "approved": false,
+                    "reviewState": "UNAPPROVED"
+                  }
+                }
+              ]
+            },
+            "approvedBy": {
+              "nodes": []
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          },
+          {
+            "id": "gid://gitlab/MergeRequest/497869033",
+            "iid": "16331",
+            "reference": "!16331",
+            "title": "Draft: Example item 9",
+            "draft": true,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/16331",
+            "createdAt": "2026-06-19T16:02:36Z",
+            "updatedAt": "2026-11-03T14:50:48Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 275,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": false,
+            "detailedMergeStatus": "DRAFT_STATUS",
+            "approved": false,
+            "approvalsRequired": 1,
+            "approvalsLeft": 1,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "DusanJ88",
+              "name": "Dusan Jankov",
+              "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "FAILED"
+            },
+            "labels": {
+              "nodes": []
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "DusanJ88",
+                  "name": "Dusan Jankov",
+                  "avatarUrl": "/uploads/-/system/user/avatar/10551939/avatar.png?v=1793729780"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": []
+            },
+            "approvedBy": {
+              "nodes": []
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          }
+        ]
+      }
+    }
+  }
+}

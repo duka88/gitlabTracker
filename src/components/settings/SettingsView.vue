@@ -1,0 +1,94 @@
+<script setup lang="ts">
+// Settings: token, interval, mentions toggle, tabs (T056, T087, T092).
+import { ref } from "vue";
+import { api } from "../../ipc";
+import { useAppState } from "../../store";
+import Icon from "../Icon.vue";
+import IssueBar from "../IssueBar.vue";
+import TokenForm from "./TokenForm.vue";
+import IntervalPicker from "./IntervalPicker.vue";
+import TabEditor from "./TabEditor.vue";
+
+const { state, closeSettings, quit, hide } = useAppState();
+const mentionError = ref<string | null>(null);
+
+async function setMentions(e: Event) {
+  mentionError.value = null;
+  try {
+    await api.setNotifyMentions((e.target as HTMLInputElement).checked);
+  } catch (err) {
+    mentionError.value = (err as { message?: string })?.message ?? String(err);
+  }
+}
+</script>
+
+<template>
+  <div class="settings">
+    <header class="head" data-tauri-drag-region="deep">
+      <button v-if="state.view?.signedIn" class="icon-btn" title="Back to tabs" aria-label="Back to tabs" @click="closeSettings">
+        <Icon name="back" :size="15" />
+      </button>
+      <h1>Settings</h1>
+      <span class="spacer" />
+      <button class="quit" @click="quit">Quit</button>
+      <button class="icon-btn" title="Close window" aria-label="Close window" @click="hide">
+        <Icon name="close" :size="15" />
+      </button>
+    </header>
+    <IssueBar v-if="state.view?.globalError && state.view.globalError.kind !== 'noToken'" :issue="state.view.globalError" />
+    <div class="body">
+      <TokenForm />
+      <section class="card">
+        <h2>Notifications</h2>
+        <IntervalPicker />
+        <label class="toggle mention">
+          <input type="checkbox" :checked="state.view?.notifyMentions" @change="setMentions" />
+          Notify when I'm mentioned
+        </label>
+        <p v-if="mentionError" class="err" role="alert">{{ mentionError }}</p>
+      </section>
+      <TabEditor />
+    </div>
+  </div>
+</template>
+
+<style scoped src="./settings.css"></style>
+<style scoped>
+.settings {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+  min-height: 36px;
+}
+h1 {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+.spacer {
+  flex: 1;
+}
+.quit {
+  font-size: var(--fs-xs);
+  padding: 1px 8px;
+}
+.body {
+  flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+  overflow-y: auto;
+  user-select: text;
+}
+.mention {
+  margin-top: 10px;
+}
+</style>

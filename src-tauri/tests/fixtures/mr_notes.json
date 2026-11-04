@@ -1,0 +1,72 @@
+{
+  "data": {
+    "n0": {
+      "mergeRequest": {
+        "notes": {
+          "nodes": [
+            {
+              "id": "gid://gitlab/DiffNote/4139210622",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-02T10:03:03Z",
+              "author": {
+                "username": "colleague2",
+                "name": "Colleague 2"
+              }
+            },
+            {
+              "id": "gid://gitlab/DiffNote/4139210866",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-02T10:03:05Z",
+              "author": {
+                "username": "colleague2",
+                "name": "Colleague 2"
+              }
+            },
+            {
+              "id": "gid://gitlab/DiffNote/4139211052",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-02T10:03:07Z",
+              "author": {
+                "username": "colleague2",
+                "name": "Colleague 2"
+              }
+            },
+            {
+              "id": "gid://gitlab/DiffNote/4139211381",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-02T10:03:10Z",
+              "author": {
+                "username": "colleague2",
+                "name": "Colleague 2"
+              }
+            },
+            {
+              "id": "gid://gitlab/DiffNote/4140830634",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-02T13:35:10Z",
+              "author": {
+                "username": "colleague3",
+                "name": "Colleague 3"
+              }
+            },
+            {
+              "id": "gid://gitlab/DiffNote/4150978290",
+              "body": "Looks good, one small question about the `retry` logic in this change.",
+              "system": false,
+              "createdAt": "2026-11-03T14:08:03Z",
+              "author": {
+                "username": "colleague2",
+                "name": "Colleague 2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

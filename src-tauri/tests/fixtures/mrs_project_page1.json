@@ -1,0 +1,144 @@
+{
+  "data": {
+    "project": {
+      "mergeRequests": {
+        "count": 114,
+        "pageInfo": {
+          "hasNextPage": true,
+          "endCursor": "eyJjcmVhdGVkX2F0IjoiMjAyNi0xMC0yOSAxMDo1NzowMC45MDE0MTEwMDAgKzAwMDAiLCJpZCI6IjU1Nzg1NDMxOSJ9"
+        },
+        "nodes": [
+          {
+            "id": "gid://gitlab/MergeRequest/561120846",
+            "iid": "19745",
+            "reference": "!19745",
+            "title": "Example item 10",
+            "draft": false,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/19745",
+            "createdAt": "2026-11-03T16:25:58Z",
+            "updatedAt": "2026-11-03T16:26:00Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 0,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": false,
+            "detailedMergeStatus": "NOT_APPROVED",
+            "approved": false,
+            "approvalsRequired": 1,
+            "approvalsLeft": 1,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "colleague7",
+              "name": "Colleague 7",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793664003"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": []
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "colleague7",
+                  "name": "Colleague 7",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793664003"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": []
+            },
+            "approvedBy": {
+              "nodes": []
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          },
+          {
+            "id": "gid://gitlab/MergeRequest/561006148",
+            "iid": "19739",
+            "reference": "!19739",
+            "title": "Example item 11",
+            "draft": false,
+            "state": "opened",
+            "webUrl": "https://gitlab.com/login5/login-eko/login-eko/-/merge_requests/19739",
+            "createdAt": "2026-11-03T14:03:02Z",
+            "updatedAt": "2026-11-03T17:15:29Z",
+            "targetBranch": "main",
+            "description": "**Goal:** make the example feature work for every tenant.\n\n## Details\n\n- First point with `code` and a [link](https://gitlab.com/login5/x/-/issues/1)\n- Second point that is long enough to push the preview past the cut-off limit so that the word-boundary truncation is exercised by the parser tests in this repository, which need a description of more than three hundred characters of plain text after the Markdown is stripped.\n",
+            "userNotesCount": 7,
+            "upvotes": 0,
+            "downvotes": 0,
+            "conflicts": false,
+            "detailedMergeStatus": "MERGEABLE",
+            "approved": true,
+            "approvalsRequired": 1,
+            "approvalsLeft": 0,
+            "project": {
+              "fullPath": "login5/login-eko/login-eko"
+            },
+            "author": {
+              "username": "colleague7",
+              "name": "Colleague 7",
+              "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793664003"
+            },
+            "milestone": null,
+            "headPipeline": {
+              "status": "SUCCESS"
+            },
+            "labels": {
+              "nodes": []
+            },
+            "assignees": {
+              "nodes": [
+                {
+                  "username": "colleague7",
+                  "name": "Colleague 7",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793664003"
+                }
+              ]
+            },
+            "reviewers": {
+              "nodes": [
+                {
+                  "username": "colleague8",
+                  "name": "Colleague 8",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793701461",
+                  "mergeRequestInteraction": {
+                    "approved": true,
+                    "reviewState": "APPROVED"
+                  }
+                },
+                {
+                  "username": "colleague9",
+                  "name": "Colleague 9",
+                  "avatarUrl": "/uploads/-/system/user/avatar/1000/avatar.png?v=1793713731",
+                  "mergeRequestInteraction": {
+                    "approved": false,
+                    "reviewState": "UNAPPROVED"
+                  }
+                }
+              ]
+            },
+            "approvedBy": {
+              "nodes": [
+                {
+                  "username": "approver1"
+                }
+              ]
+            },
+            "resolvableDiscussionsCount": 0,
+            "resolvedDiscussionsCount": 0
+          }
+        ]
+      }
+    }
+  }
+}

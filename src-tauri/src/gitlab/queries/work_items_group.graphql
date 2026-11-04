@@ -1,0 +1,52 @@
+query GroupWorkItems(
+  $fullPath: ID!
+  $state: IssuableState
+  $authorUsername: String
+  $assigneeUsernames: [String!]
+  $labelName: [String!]
+  $milestoneTitle: [String!]
+  $not: NegatedWorkItemFilterInput
+  $status: WorkItemWidgetStatusFilterInput
+  $types: [IssueType!]
+  $search: String
+  $sort: WorkItemSort
+  $after: String
+) {
+  group(fullPath: $fullPath) {
+    workItems(first: 50, after: $after, state: $state, authorUsername: $authorUsername, assigneeUsernames: $assigneeUsernames, labelName: $labelName, milestoneTitle: $milestoneTitle, not: $not, status: $status, types: $types, search: $search, sort: $sort, includeDescendants: true) { ...WiPage }
+  }
+}
+
+fragment WiPage on WorkItemConnection {
+  count
+  pageInfo { hasNextPage endCursor }
+  nodes {
+    id
+    iid
+    reference(full: false)
+    title
+    confidential
+    state
+    webUrl
+    createdAt
+    updatedAt
+    userDiscussionsCount
+    namespace { fullPath }
+    workItemType { name iconName }
+    author { username name avatarUrl }
+    widgets {
+      __typename
+      ... on WorkItemWidgetAssignees { assignees(first: 10) { nodes { username name avatarUrl } } }
+      ... on WorkItemWidgetLabels { labels(first: 20) { nodes { title color textColor } } }
+      ... on WorkItemWidgetMilestone { milestone { title } }
+      ... on WorkItemWidgetIteration { iteration { title startDate dueDate iterationCadence { title } } }
+      ... on WorkItemWidgetStartAndDueDate { dueDate }
+      ... on WorkItemWidgetWeight { weight }
+      ... on WorkItemWidgetStatus { status { name color iconName } }
+      ... on WorkItemWidgetHealthStatus { healthStatus }
+      ... on WorkItemWidgetAwardEmoji { upvotes downvotes }
+      ... on WorkItemWidgetDescription { description }
+      ... on WorkItemWidgetHierarchy { rolledUpCountsByType { countsByState { all closed } } }
+    }
+  }
+}

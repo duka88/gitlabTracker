@@ -173,6 +173,27 @@ fn synthetic_work_item_every_widget() {
     );
     assert_eq!(i.labels[0].scope.as_deref(), Some("state"));
     assert_eq!(i.labels[0].value, "In Development");
+    assert_eq!(i.closed_at, None);
+}
+
+/// Closed work items carry `closedAt`, used for the month/week grouping.
+#[test]
+fn work_item_closed_at() {
+    let conn = serde_json::json!({
+        "count": 1,
+        "pageInfo": { "hasNextPage": false, "endCursor": null },
+        "nodes": [{
+            "id": "gid://gitlab/WorkItem/9", "iid": "9", "reference": "#9", "title": "Done",
+            "state": "CLOSED", "webUrl": "https://gitlab.com/g/p/-/work_items/9",
+            "createdAt": "2026-10-01T08:00:00Z", "updatedAt": "2026-11-02T10:30:00Z",
+            "closedAt": "2026-11-02T10:00:00Z", "widgets": []
+        }]
+    });
+    let (items, _, _) = parse_work_item_page(&conn).unwrap();
+    assert_eq!(
+        items[0].closed_at.unwrap().to_rfc3339(),
+        "2026-11-02T10:00:00+00:00"
+    );
 }
 
 #[test]

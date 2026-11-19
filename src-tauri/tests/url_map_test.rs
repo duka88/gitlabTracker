@@ -27,7 +27,7 @@ fn default_my_mrs() {
 
 #[test]
 fn default_reviewing() {
-    let q = parse_tab_url(&default_tabs()[1].url).unwrap();
+    let q = parse_tab_url(&default_tabs()[2].url).unwrap();
     assert_eq!(
         q.scope,
         Scope::Dashboard {
@@ -41,7 +41,7 @@ fn default_reviewing() {
 
 #[test]
 fn default_my_tickets() {
-    let q = parse_tab_url(&default_tabs()[2].url).unwrap();
+    let q = parse_tab_url(&default_tabs()[3].url).unwrap();
     assert_eq!(q.kind, ListKind::WorkItems);
     assert_eq!(
         q.scope,
@@ -65,7 +65,7 @@ fn default_my_tickets() {
 
 #[test]
 fn default_ready_to_merge() {
-    let q = parse_tab_url(&default_tabs()[3].url).unwrap();
+    let q = parse_tab_url(&default_tabs()[4].url).unwrap();
     assert_eq!(
         q.scope,
         Scope::Group {
@@ -74,6 +74,37 @@ fn default_ready_to_merge() {
     );
     assert_eq!(q.filters.labels, s(&["state::Ready to Merge"]));
     assert_eq!(q.filters.not_milestone.as_deref(), Some("Backlog"));
+}
+
+/// FR-015, FR-034: "On resource-test" is My MRs filtered to the test branch.
+#[test]
+fn default_on_resource_test() {
+    let tabs = default_tabs();
+    assert_eq!(tabs.len(), 6);
+    assert_eq!(tabs[1].name, "On resource-test");
+    assert_eq!(tabs[1].url, tabs[0].url);
+    assert_eq!(tabs[1].test_branch.as_deref(), Some("resource-test"));
+    assert!(tabs[1].notify_new_items && tabs[1].notify_new_comments && tabs[1].notify_changes);
+    assert_eq!(
+        parse_tab_url(&tabs[1].url).unwrap().kind,
+        ListKind::MergeRequests
+    );
+}
+
+/// FR-015, FR-038: "Done" lists my closed tickets, newest closed first, grouped by week.
+#[test]
+fn default_done() {
+    let tab = &default_tabs()[5];
+    assert_eq!(tab.name, "Done");
+    assert!(tab.group_by_week);
+    assert!(!tab.notify_new_items && !tab.notify_new_comments && !tab.notify_changes);
+    let q = parse_tab_url(&tab.url).unwrap();
+    assert_eq!(q.kind, ListKind::WorkItems);
+    assert_eq!(q.filters.state.as_deref(), Some("closed"));
+    assert_eq!(q.filters.assignees, s(&["DusanJ88"]));
+    assert_eq!(q.filters.sort.as_deref(), Some("CLOSED_AT_DESC"));
+    assert!(!q.sort_fallback);
+    assert_eq!(q.ignored_params, [] as [std::string::String; 0]);
 }
 
 #[test]
@@ -239,7 +270,7 @@ fn single_namespace_without_groups_prefix_is_group() {
 
 #[test]
 fn check_url_hint() {
-    let c = check_url(&default_tabs()[2].url);
+    let c = check_url(&default_tabs()[3].url);
     assert!(c.valid);
     assert_eq!(c.kind, Some(ListKind::WorkItems));
     assert_eq!(c.scope_label.as_deref(), Some("Group login5"));

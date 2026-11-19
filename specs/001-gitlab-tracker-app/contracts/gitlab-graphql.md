@@ -9,7 +9,7 @@ Endpoint: `POST https://gitlab.com/api/graphql` (`GITLAB_HOST`, research R17), `
 | `GroupMRs` / `ProjectMRs` | Group/project MR tabs | `fullPath`, filters, `after` | `group{ mergeRequests(includeSubgroups:true …) }` / `project{ mergeRequests }` |
 
 The shared `MrFields` fragment (all three MR queries) also selects, since 2026-11-04: `approvedBy(first:20){nodes{username}}`, `resolvableDiscussionsCount`, `resolvedDiscussionsCount` (FR-025a/b), `sourceBranch`, `diffHeadSha` (FR-034) and `workItemRelations(first:10){ nodes{ linkType workItem{ iid reference title webUrl state widgets{ __typename …Status …Labels } } } }` (FR-036, research R19). Verified under GitLab's complexity limit at 50 per page.
-| `GroupWorkItems` / `ProjectWorkItems` | Work-item tabs | `fullPath`, filters, `status?`, `after` | Widgets per R5. Retry without `status` on a schema/argument error (R3). |
+| `GroupWorkItems` / `ProjectWorkItems` | Work-item tabs | `fullPath`, filters, `status?`, `after` | Widgets per R5, plus `closedAt` (2026-11-05, FR-038). Retry without `status` on a schema/argument error (R3). |
 | `WorkItemCommentCounts` | Fallback (b) in R5 | `fullPath`, `iids` | Only if `WorkItem` has no notes count. |
 | `RecentNotesBatch` | New comments (FR-021) | built dynamically with aliases `n0…n9` | MR: `project(fullPath){ mergeRequest(iid){ notes(last:20){…} } }`. Work item: `workItem(id){ widgets{ …on WorkItemWidgetNotes{ discussions(last:20, filter: ONLY_COMMENTS){…} } } }` |
 | `MergedCheckBatch` | MR removed from a tab (FR-022b) | aliases | `project(fullPath){ mergeRequest(iid){ state mergedAt mergeUser{username} } }` |

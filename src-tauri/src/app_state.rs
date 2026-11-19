@@ -130,12 +130,12 @@ impl Core {
                 let ts = self.state.tabs.get(&tab.id);
                 TabView {
                     tab: tab.clone(),
-                    items: ts.map(|s| s.items.clone()).unwrap_or_default(),
+                    items: ts.map_or_default(|s| s.items.clone()),
                     item_count: ts.map_or(0, |s| s.items.len() as u32),
                     new_count: ts.map_or(0, |s| tab_badge(s, swv).len() as u32),
-                    new_items: ts.map(|s| s.new_items.clone()).unwrap_or_default(),
-                    new_comments: ts.map(|s| s.new_comments.clone()).unwrap_or_default(),
-                    changes: ts.map(|s| s.changes.clone()).unwrap_or_default(),
+                    new_items: ts.map_or_default(|s| s.new_items.clone()),
+                    new_comments: ts.map_or_default(|s| s.new_comments.clone()),
+                    changes: ts.map_or_default(|s| s.changes.clone()),
                     error: ts.and_then(|s| s.error.clone()),
                     warning: ts.and_then(|s| s.warning.clone()),
                     truncated_total: ts.and_then(|s| s.truncated_total),
@@ -211,6 +211,7 @@ pub fn apply_tab_edits(new_tabs: Vec<Tab>, state: &mut PersistedState) -> Result
             }
             _ => None,
         };
+        tab.group_by_week = tab.group_by_week && tab.kind == crate::model::ListKind::WorkItems;
         if tab.id.is_empty() || !ids.insert(tab.id.clone()) {
             tab.id = uuid::Uuid::new_v4().to_string();
             ids.insert(tab.id.clone());

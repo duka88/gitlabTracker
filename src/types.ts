@@ -2,6 +2,9 @@
 
 export type ListKind = "mergeRequests" | "workItems";
 
+/** Row order in the list view; sorted in the UI. `gitlab` keeps the URL's order. */
+export type TabSort = "gitlab" | "label" | "updated" | "created" | "title";
+
 export interface Tab {
   id: string;
   name: string;
@@ -12,6 +15,10 @@ export interface Tab {
   notifyChanges: boolean;
   /** MR tabs: only MRs merged into this branch (FR-034). */
   testBranch?: string | null;
+  /** Work-item tabs: group rows by month and week (FR-038). */
+  groupByWeek?: boolean;
+  /** The tab's default row order. */
+  sort?: TabSort;
 }
 
 export interface UserInfo {
@@ -124,6 +131,8 @@ export interface ListItem {
   author: Person | null;
   createdAt: string;
   updatedAt: string;
+  /** Work items: when closed (FR-038). */
+  closedAt?: string | null;
   labels: Label[];
   assignees: Person[];
   milestone: string | null;

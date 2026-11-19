@@ -14,8 +14,8 @@ The webview never talks to GitLab and never sees the token (constitution II/III)
 | `set_notify_mentions` | `{ enabled: boolean }` | `()` | |
 | `set_test_branch` | `{ branch: string \| null }` | `()` | Global branch flagged on every MR (FR-037). Trimmed; empty/`null` turns it off; whitespace inside → `Invalid`. Saves, emits `state://updated` and triggers a poll. |
 | `validate_url` | `{ url: string }` | `UrlCheck` | Pure parse, no network. `UrlCheck = { valid, kind?, scopeLabel?, filtersSummary?: string[], ignoredParams: string[], error?: string }` (FR-013). |
-| `save_tabs` | `{ tabs: Tab[] }` | `Tab[]` | Replaces the whole ordered list (add, rename, reorder, delete, toggles). Ids are added to new tabs. Every URL must be valid. Tabs whose URL or `testBranch` changed get their state reset. `Tab.testBranch?: string \| null` (MR tabs only, trimmed, no whitespace, dropped on work-item tabs, FR-034). Triggers a poll. |
-| `reset_default_tabs` | — | `Tab[]` | Restores the 4 defaults (R14). |
+| `save_tabs` | `{ tabs: Tab[] }` | `Tab[]` | Replaces the whole ordered list (add, rename, reorder, delete, toggles). Ids are added to new tabs. Every URL must be valid. Tabs whose URL or `testBranch` changed get their state reset. `Tab.testBranch?: string \| null` (MR tabs only, trimmed, no whitespace, dropped on work-item tabs, FR-034). `Tab.groupByWeek?: boolean` (work-item tabs only, dropped on MR tabs; doesn't reset state, FR-038). `Tab.sort?: "gitlab" \| "label" \| "updated" \| "created" \| "title"` (default row order, default `gitlab`; doesn't reset state, FR-039). Triggers a poll. |
+| `reset_default_tabs` | — | `Tab[]` | Restores the 6 defaults (R14). |
 | `refresh_now` | — | `()` | Starts a poll, or does nothing if one is running (FR-018). |
 | `select_tab` | `{ tabId: string }` | `()` | Sets `active_tab_id` and clears that tab's markers (FR-023). |
 | `open_bell` | — | `NotificationEntry[]` | Returns entries newest first and marks them all read (FR-024c). |
@@ -59,4 +59,5 @@ The webview never talks to GitLab and never sees the token (constitution II/III)
 ## View fields added 2026-11-04
 
 - `AppView.testBranch: string | null` (FR-037).
+- `ListItem.closedAt?: string | null` (work items, FR-038).
 - `MrFields` adds `unresolvedThreads: number` (FR-025b), `sourceBranch`, `headSha`, `onBranch: { branch, upToDate, mergedAt } | null` (FR-034/FR-037), and `ticket: { reference, title, webUrl, open, stateLabel: Label | null, status: { name, color } | null } | null` (FR-036). `MergeStatusTag` adds `"approved"`. `approvals.approved` and `approvals.given` follow FR-025a.

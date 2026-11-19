@@ -72,8 +72,7 @@ pub fn save<T: Serialize>(path: &Path, value: &T) -> std::io::Result<()> {
 fn tmp_path(path: &Path) -> PathBuf {
     let mut name = path
         .file_name()
-        .map(std::ffi::OsStr::to_os_string)
-        .unwrap_or_default();
+        .map_or_default(std::ffi::OsStr::to_os_string);
     name.push(".tmp");
     path.with_file_name(name)
 }

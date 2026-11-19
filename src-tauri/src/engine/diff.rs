@@ -160,8 +160,7 @@ pub fn diff_changes(prev: &Tracked, current: &ListItem, me: Option<&str>) -> Vec
                     .mr
                     .as_ref()
                     .and_then(|m| m.reviewers.iter().find(|r| &r.person.username == user))
-                    .map(|r| r.person.name.clone())
-                    .unwrap_or_default();
+                    .map_or_default(|r| r.person.name.clone());
                 out.push(ChangeKind::ChangesRequested {
                     by_username: user.clone(),
                     by_name: name,

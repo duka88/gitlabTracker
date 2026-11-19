@@ -3,7 +3,8 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { api } from "../../ipc";
 import { useAppState } from "../../store";
-import type { ListKind, Tab, UrlCheck } from "../../types";
+import type { ListKind, Tab, TabSort, UrlCheck } from "../../types";
+import { SORT_OPTIONS } from "../../util/sort";
 import Icon from "../Icon.vue";
 
 interface Draft {
@@ -16,6 +17,8 @@ interface Draft {
   notifyNewComments: boolean;
   notifyChanges: boolean;
   testBranch: string;
+  groupByWeek: boolean;
+  sort: TabSort;
   check: UrlCheck | null;
   checking: boolean;
   confirmDelete: boolean;
@@ -32,7 +35,7 @@ let nextKey = 1;
 const timers = new Map<number, ReturnType<typeof setTimeout>>();
 
 function toDraft(t: Tab): Draft {
-  return { key: nextKey++, ...t, testBranch: t.testBranch ?? "", check: null, checking: false, confirmDelete: false };
+  return { key: nextKey++, ...t, testBranch: t.testBranch ?? "", groupByWeek: t.groupByWeek ?? false, sort: t.sort ?? "gitlab", check: null, checking: false, confirmDelete: false };
 }
 
 function load(tabs: readonly Tab[]) {
@@ -85,6 +88,16 @@ function hint(c: UrlCheck): string {
   return parts.join(" · ");
 }
 
+// Turning grouping on also turns the tab's notifications off; the user may turn them back on (FR-038).
+function onGroupChange(d: Draft) {
+  touch();
+  if (d.groupByWeek) {
+    d.notifyNewItems = false;
+    d.notifyNewComments = false;
+    d.notifyChanges = false;
+  }
+}
+
 function add() {
   touch();
   const d = toDraft({ id: "", name: "", url: "", kind: "mergeRequests", notifyNewItems: true, notifyNewComments: true, notifyChanges: true });
@@ -130,6 +143,8 @@ async function save() {
       notifyNewComments: d.notifyNewComments,
       notifyChanges: d.notifyChanges,
       testBranch: (d.check?.kind ?? d.kind) === "mergeRequests" && d.testBranch.trim() ? d.testBranch.trim() : null,
+      groupByWeek: (d.check?.kind ?? d.kind) === "workItems" && d.groupByWeek,
+      sort: d.sort,
     }));
     load(await api.saveTabs(tabs));
     savedNote.value = true;
@@ -190,6 +205,15 @@ onBeforeUnmount(() => timers.forEach((t) => clearTimeout(t)));
             @input="touch"
           />
         </div>
+        <label v-if="(d.check?.kind ?? d.kind) === 'workItems'" class="toggle group">
+          <input v-model="d.groupByWeek" type="checkbox" @change="onGroupChange(d)" /> Group by month and week (counts per week)
+        </label>
+        <div class="branch">
+          <label :for="`sort-${d.key}`">Default sort</label>
+          <select :id="`sort-${d.key}`" v-model="d.sort" @change="touch">
+            <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value">{{ o.label }}</option>
+          </select>
+        </div>
         <div class="toggles">
           <label class="toggle"><input v-model="d.notifyNewItems" type="checkbox" @change="touch" /> New items</label>
           <label class="toggle"><input v-model="d.notifyNewComments" type="checkbox" @change="touch" /> Comments</label>
@@ -200,7 +224,7 @@ onBeforeUnmount(() => timers.forEach((t) => clearTimeout(t)));
     <div class="actions">
       <button @click="add"><Icon name="plus" :size="12" /> Add tab</button>
       <template v-if="confirmReset">
-        <span class="small">Replace all tabs with the 4 defaults?</span>
+        <span class="small">Replace all tabs with the 6 defaults?</span>
         <button class="danger" @click="reset">Reset</button>
         <button @click="confirmReset = false">Cancel</button>
       </template>
@@ -277,6 +301,9 @@ onBeforeUnmount(() => timers.forEach((t) => clearTimeout(t)));
 .branch input {
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
+}
+.group {
+  font-size: var(--fs-sm);
 }
 .toggles {
   display: flex;

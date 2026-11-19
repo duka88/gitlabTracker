@@ -133,8 +133,7 @@ pub fn truncate_words(s: &str, max: usize) -> String {
 
 /// Plain-text preview of a description: Markdown stripped, at most `max` characters.
 pub fn preview(md: Option<&str>, max: usize) -> String {
-    md.map(|m| truncate_words(&markdown_to_plain(m), max))
-        .unwrap_or_default()
+    md.map_or_default(|m| truncate_words(&markdown_to_plain(m), max))
 }
 
 #[cfg(test)]

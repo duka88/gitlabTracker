@@ -101,8 +101,7 @@ pub fn parse_tab_url(input: &str) -> Result<TabQuery, UrlError> {
 
     let segments: Vec<&str> = url
         .path_segments()
-        .map(|s| s.filter(|p| !p.is_empty()).collect())
-        .unwrap_or_default();
+        .map_or_default(|s| s.filter(|p| !p.is_empty()).collect());
 
     let (kind, scope_kind) = parse_path(&segments)?;
 

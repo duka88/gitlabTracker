@@ -282,7 +282,7 @@ fn label(l: &LabelRaw) -> Label {
 }
 
 fn nodes<T: Clone>(n: Option<&Nodes<T>>) -> Vec<T> {
-    n.map(|n| n.nodes.clone()).unwrap_or_default()
+    n.map_or_default(|n| n.nodes.clone())
 }
 
 pub fn mr_to_item(mr: &MrRaw) -> ListItem {
@@ -319,14 +319,11 @@ pub fn mr_to_item(mr: &MrRaw) -> ListItem {
         },
         title: mr.title.clone(),
         web_url: mr.web_url.clone(),
-        project_path: mr
-            .project
-            .as_ref()
-            .map(|p| p.full_path.clone())
-            .unwrap_or_default(),
+        project_path: mr.project.as_ref().map_or_default(|p| p.full_path.clone()),
         author: mr.author.as_ref().map(person),
         created_at: created,
         updated_at: mr.updated_at.unwrap_or(created),
+        closed_at: None,
         labels: nodes(mr.labels.as_ref()).iter().map(label).collect(),
         assignees: nodes(mr.assignees.as_ref()).iter().map(person).collect(),
         milestone: mr.milestone.as_ref().and_then(|m| m.title.clone()),
@@ -369,6 +366,7 @@ pub struct WorkItemRaw {
     pub web_url: String,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
+    pub closed_at: Option<DateTime<Utc>>,
     pub user_discussions_count: Option<u32>,
     pub namespace: Option<PathRaw>,
     pub work_item_type: Option<TypeRaw>,
@@ -398,13 +396,11 @@ pub fn work_item_to_item(wi: &WorkItemRaw) -> ListItem {
     let assignees: Vec<PersonRaw> = parse_at::<Nodes<PersonRaw>>(
         widget(w, "WorkItemWidgetAssignees").and_then(|x| x.get("assignees")),
     )
-    .map(|n| n.nodes)
-    .unwrap_or_default();
+    .map_or_default(|n| n.nodes);
     let labels: Vec<LabelRaw> = parse_at::<Nodes<LabelRaw>>(
         widget(w, "WorkItemWidgetLabels").and_then(|x| x.get("labels")),
     )
-    .map(|n| n.nodes)
-    .unwrap_or_default();
+    .map_or_default(|n| n.nodes);
     let milestone =
         parse_at::<Titled>(widget(w, "WorkItemWidgetMilestone").and_then(|x| x.get("milestone")))
             .and_then(|m| m.title);
@@ -481,11 +477,11 @@ pub fn work_item_to_item(wi: &WorkItemRaw) -> ListItem {
         project_path: wi
             .namespace
             .as_ref()
-            .map(|p| p.full_path.clone())
-            .unwrap_or_default(),
+            .map_or_default(|p| p.full_path.clone()),
         author: wi.author.as_ref().map(person),
         created_at: created,
         updated_at: wi.updated_at.unwrap_or(created),
+        closed_at: wi.closed_at,
         labels: labels.iter().map(label).collect(),
         assignees: assignees.iter().map(person).collect(),
         milestone,

@@ -30,6 +30,7 @@ fragment WiPage on WorkItemConnection {
     webUrl
     createdAt
     updatedAt
+    closedAt
     userDiscussionsCount
     namespace { fullPath }
     workItemType { name iconName }

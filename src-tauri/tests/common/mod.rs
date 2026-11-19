@@ -9,7 +9,7 @@ use gitlab_tracker_lib::error::AppError;
 use gitlab_tracker_lib::gitlab::lists::FetchResult;
 use gitlab_tracker_lib::model::{
     Approvals, Label, ListItem, ListKind, MrFields, PersistedState, Person, PipelineStatus,
-    Reviewer, Tab, WorkItemFields, WorkStatus,
+    Reviewer, Tab, TabSort, WorkItemFields, WorkStatus,
 };
 
 pub fn t0() -> DateTime<Utc> {
@@ -38,6 +38,8 @@ pub fn tab(id: &str, name: &str, kind: ListKind) -> Tab {
         notify_new_comments: true,
         notify_changes: true,
         test_branch: None,
+        group_by_week: false,
+        sort: TabSort::Gitlab,
     }
 }
 
@@ -61,6 +63,7 @@ pub fn mr(n: u32) -> ListItem {
         author: Some(person("author")),
         created_at: t0(),
         updated_at: t0(),
+        closed_at: None,
         labels: vec![],
         assignees: vec![],
         milestone: None,
@@ -102,6 +105,7 @@ pub fn wi(n: u32) -> ListItem {
         author: Some(person("author")),
         created_at: t0(),
         updated_at: t0(),
+        closed_at: None,
         labels: vec![Label::new("state::In Testing", "#000", "#fff")],
         assignees: vec![],
         milestone: None,

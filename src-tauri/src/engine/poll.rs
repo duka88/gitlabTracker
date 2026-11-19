@@ -104,8 +104,7 @@ impl<'a> PollRun<'a> {
         let visible_gids: HashSet<String> = self
             .visible_tab
             .and_then(|id| state.tabs.get(id))
-            .map(|s| s.items.iter().map(|i| i.gid.clone()).collect())
-            .unwrap_or_default();
+            .map_or_default(|s| s.items.iter().map(|i| i.gid.clone()).collect());
         diff_mentions(mentions, &mut state.global, me, &visible_gids, self.now)
     }
 

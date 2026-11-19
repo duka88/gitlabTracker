@@ -183,9 +183,11 @@
 | Tab | URL |
 |---|---|
 | My MRs | `https://gitlab.com/dashboard/merge_requests?author_username=DusanJ88&state=opened` |
+| On resource-test (added 2026-11-05; test branch `resource-test`, FR-034) | `https://gitlab.com/dashboard/merge_requests?author_username=DusanJ88&state=opened` |
 | Reviewing | `https://gitlab.com/dashboard/merge_requests?reviewer_username=DusanJ88&state=opened` |
 | My tickets | `https://gitlab.com/groups/login5/-/work_items?state=opened&assignee_username[]=DusanJ88&status=To%20do&not[milestone_title]=Backlog&not[label_name][]=state::Ready%20to%20Merge&not[label_name][]=state::Ready%20for%20Testing&not[label_name][]=state::In%20Testing` |
 | Ready to merge | `https://gitlab.com/groups/login5/-/work_items?state=opened&assignee_username[]=DusanJ88&label_name[]=state::Ready%20to%20Merge&not[milestone_title]=Backlog` |
+| Done (added 2026-11-05, FR-038; grouped by month and week, notifications off) | `https://gitlab.com/groups/login5/-/work_items?state=closed&assignee_username[]=DusanJ88&sort=closed_at_desc` |
 
 - **VERIFIED (2026-11-03)**: the labels are scoped: `state::Ready to Merge`, `state::Ready for Testing`, `state::In Testing`. The URLs above use the scoped names (see Verification results).
 

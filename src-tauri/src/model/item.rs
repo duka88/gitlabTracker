@@ -19,6 +19,9 @@ pub struct ListItem {
     pub author: Option<Person>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    /// Work items: when it was closed; drives the month/week grouping.
+    #[serde(default)]
+    pub closed_at: Option<DateTime<Utc>>,
     pub labels: Vec<Label>,
     pub assignees: Vec<Person>,
     pub milestone: Option<String>,

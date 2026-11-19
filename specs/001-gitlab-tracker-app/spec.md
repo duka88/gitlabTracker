@@ -37,6 +37,20 @@
 - Q: What happens after the first token is saved? → A: The app leaves Settings and shows the tabs. Replacing a token while already signed in stays in Settings.
 - Q: What does a token need? → A: A classic Personal Access Token with `read_api` is enough. A fine-grained token needs at least **User: Read**, plus read access to merge requests, work items/issues, to-dos, projects and groups for the tracked paths. Without User: Read, GitLab answers the sign-in check with an empty user, and the app reports "Token rejected".
 
+### Session 2026-11-05
+
+- Q: How do we see how many tickets we did each week? → A: A work-item tab can turn on "Group by month and week". Its rows are grouped by month (newest first), and inside each month by week, each heading showing its ticket count (e.g. "November 2026 · 12", "Nov 3 – Nov 9 · 5").
+- Q: Whose tickets count? → A: Only mine, the tickets assigned to me; the rest of the team isn't tracked. The tab's URL sets this: `https://gitlab.com/groups/login5/-/work_items?state=closed&assignee_username[]=DusanJ88&sort=closed_at_desc`.
+- Q: When does a ticket count as "done" for a week? → A: When it was closed (GitLab's closed date). A row that isn't closed is placed by its last update.
+- Q: Where does a week that spans two months go? → A: It's split at the month end. Each part sits under its own month, so month totals are exact.
+- Q: How far back does a grouped tab go? → A: No extra setting: the newest 500 rows of the URL (sorted by closed date), with the usual "Showing 500 of N" warning when there are more, in which case the oldest month may be incomplete.
+- Q: Are the ticket rows shown under each week? → A: Yes. Month and week headings can be clicked to collapse them, leaving just the counts.
+- Q: Should the Done tab be a default tab? → A: Yes. A fifth default tab "Done" (my closed tickets, grouped by month and week, notifications off) is added to FR-015. Existing installs get it through "Reset to defaults" or by adding it by hand; saved tabs aren't changed.
+- Q: Should "On resource-test" be a default tab too? → A: Yes, second, after My MRs: my open MRs filtered to the test branch `resource-test` (FR-034), all notifications on. That makes 6 default tabs.
+- Q: Should all months and weeks be expanded? → A: No. Only the current month and the current week (today's) start expanded; every other month and week starts collapsed, showing just its count. Clicking a heading expands or collapses it.
+- Q: How many months does a grouped tab show? → A: The last 12 months (this month and the 11 before it). When older tickets were loaded, a "Show more" button under the last month adds 12 more months per click. This only limits what's shown; the tab still loads up to 500 rows.
+- Q: Should a grouped tab notify about newly closed tickets? → A: Not by default. Turning grouping on in the tab editor also turns off the tab's three notify switches; the user can turn them back on.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See my GitLab lists from the menu bar (Priority: P1)
@@ -45,7 +59,7 @@ As a developer, I click a menu bar icon and a small window drops down under it w
 
 **Why this priority**: This is the core value. Without lists, notifications and tab editing have nothing to work on.
 
-**Independent Test**: Save a valid token, click the icon, and confirm each of the 4 default tabs shows the same items as the matching GitLab page, and that clicking a row opens the right page.
+**Independent Test**: Save a valid token, click the icon, and confirm each of the 6 default tabs shows the same items as the matching GitLab page, and that clicking a row opens the right page.
 
 **Acceptance Scenarios**:
 
@@ -141,7 +155,7 @@ As a developer, I get a notification when someone @mentions me anywhere in GitLa
 
 As a developer, I can create a new tab by filtering a list in GitLab, copying the URL and pasting it into the app. I can also rename, reorder, delete and toggle notifications for tabs, and change the checking interval.
 
-**Why this priority**: The 4 default tabs cover the main need. Editing makes the app adaptable.
+**Why this priority**: The 6 default tabs cover the main need. Editing makes the app adaptable.
 
 **Independent Test**: In Settings, add a tab with a pasted GitLab MR or work-item list URL, see the live "valid" hint, save, and confirm the new tab loads the same items as GitLab.
 
@@ -150,8 +164,9 @@ As a developer, I can create a new tab by filtering a list in GitLab, copying th
 1. **Given** the tab editor, **When** the user pastes a URL, **Then** a live hint shows "valid" (with the detected type: merge requests or work items) or "invalid" with a reason.
 2. **Given** a valid tab is saved, **Then** it appears in the tab bar and loads data on the next check (or straight away).
 3. **Given** the editor, **Then** the user can rename, reorder, delete, and toggle "notify on new items", "notify on new comments" and "notify on changes" for any tab.
-4. **Given** the app starts with no saved tabs, **Then** it creates the 4 default tabs: My MRs, Reviewing, My tickets, Ready to merge.
+4. **Given** the app starts with no saved tabs, **Then** it creates the 6 default tabs: My MRs, On resource-test, Reviewing, My tickets, Ready to merge, Done.
 5. **Given** the interval setting, **Then** the user can pick 1, 2, 5 or 10 minutes (default 2), and the footer shows "Updated Xm ago · every N min".
+6. **Given** a work-item tab with "Group by month and week" on and a URL listing closed tickets, **Then** the tab shows a heading per month with its ticket count, and under it a heading per week (Monday–Sunday, newest first) with its count, followed by that week's rows; only the current month and week start expanded, the others show just their count until clicked; only the last 12 months are shown, with "Show more" adding 12 older months per click (FR-038).
 
 ---
 
@@ -190,6 +205,7 @@ As a developer, when something goes wrong I see a clear message, and I still get
 - Very long titles or many labels: rows wrap labels and truncate the title, and hover shows the full title.
 - A fine-grained token without **User: Read**: GitLab returns HTTP 200 with `currentUser: null` (REST returns 403 `insufficient_granular_scope`). The app treats it as "Token rejected" and doesn't save it. The Settings hint names `read_api` (classic token) as the simple option.
 - A test-branch tab where branches were merged into the test branch more than 100 merges ago, or merged with a non-standard commit title, and pushed since: shown only once the latest commit is on the test branch (the outdated check looks at the newest 100 first-parent commits and git's "Merge branch '<name>'" titles). A squash or cherry-pick onto the test branch isn't detected.
+- A grouped tab (FR-038) with more than 500 closed tickets: only the newest 500 are grouped, the "Showing 500 of N" warning shows, and the oldest month shown may be incomplete. A ticket reopened and closed again counts in the week of its latest close.
 - A list taller than the window: the list scrolls inside the window; the page itself never scrolls, so the header can't be scrolled out of reach.
 
 ## Requirements *(mandatory)*
@@ -222,11 +238,13 @@ As a developer, when something goes wrong I see a clear message, and I still get
 - **FR-012**: Filters carried over from the URL MUST include: state, author, reviewer, assignee, labels, excluded labels, milestone, excluded milestone, status (work items), type (work items), draft (MRs), search and sort. The URL's page size is ignored, because each tab loads all matching items (FR-016).
 - **FR-013**: The tab editor MUST give a live valid/invalid hint while typing or pasting a URL, including the detected list type and any ignored parameters.
 - **FR-014**: Users MUST be able to add, rename, reorder and delete tabs, and toggle their notification switches.
-- **FR-015**: On first start (no saved tabs), the app MUST create these 4 tabs for gitlab.com / user DusanJ88 / group login5:
+- **FR-015**: On first start (no saved tabs), the app MUST create these 6 tabs for gitlab.com / user DusanJ88 / group login5:
   - **My MRs**: open MRs authored by the user. Notify on new items, new comments and changes.
+  - **On resource-test**: open MRs authored by the user whose source branch is merged into `resource-test` (test branch, FR-034). Notify on new items, new comments and changes.
   - **Reviewing**: open MRs where the user is a reviewer. Notify on new items, new comments and changes.
   - **My tickets**: open work items assigned to the user with status "To do", excluding milestone "Backlog" and labels "Ready to Merge", "Ready for Testing" and "In Testing". Notify on new items, new comments and changes.
   - **Ready to merge**: open work items assigned to the user with the label "Ready to Merge", excluding milestone "Backlog". Notify on new items, new comments and changes.
+  - **Done**: closed work items assigned to the user, newest closed first, grouped by month and week (FR-038). All three notify switches off.
 - **FR-016**: Each tab MUST load all items matching its URL on every check, following pages until done (safety limit: 500 items, with a warning). Each page request MUST return the row data, including pipeline status and approvals for MRs. At most one extra request per tab is allowed when GitLab can't return a field in the list query (e.g. work-item comment counts).
 - **FR-017**: If a work-item query fails because of the status filter, the app MUST retry without it and show a warning on that tab.
 
@@ -278,6 +296,8 @@ As a developer, when something goes wrong I see a clear message, and I still get
 - **FR-036a**: Each MR row MUST say explicitly whether the MR is "approved" or "not approved" (FR-025a), followed by the approval count when there is one (e.g. "approved 1/1").
 - **FR-036b**: When an MR's linked items don't include its work item (ticket) (nothing linked, or the ticket is past the first 10 links), the app MUST look the ticket up by the number at the start of the source branch name, in the MR's project, and apply FR-036 to it. Tickets without a `state::` label show GitLab's status (e.g. "To do").
 - **FR-037**: Settings MUST have a global "Test branch" (trimmed, no spaces, empty = off). When set, every MR in every MR tab that is on that branch MUST carry the "on <branch>" / "outdated on <branch>" tag of FR-034, without filtering the tab. A tab's own test branch (FR-034) still filters that tab. Changing the setting MUST trigger a refresh.
+- **FR-038**: A work-item tab MAY turn on "Group by month and week" (ignored on MR tabs). Its rows MUST then be grouped by calendar month, newest first, and within each month by week (Monday to Sunday, local time), newest first; a week that spans two months is split at the month end, each part under its own month. Each month and week heading MUST show its number of rows, and a week heading its date range clipped to the month (e.g. "Oct 27 – Oct 31", "Nov 1 – Nov 2"). A row's date is its closed date, or its last-update date when it isn't closed. Rows inside a week keep the order of the tab's URL. Only the current month and the current week (by today's date) MUST start expanded; every other month and week MUST start collapsed, showing its heading and count. Clicking a heading MUST expand or collapse it, and that choice holds until the app restarts. Only months from the current one back 11 months (12 in total) MUST be shown at first; when older rows exist, a "Show more" control below the last month MUST show the number of hidden rows and add 12 more months per click. A row opened from a notification MUST be revealed (its month shown and its month and week expanded). The usual 500-row limit and warning apply (FR-016). Turning the option on in the tab editor MUST also turn off the tab's three notify switches (the user may turn them back on); turning it on or off MUST NOT reset the tab's baseline or notify.
+- **FR-039**: Each tab MUST have a default sort, set in the tab editor: GitLab order (the URL's order, the default), Label (by the row's label titles A–Z, compared title by title; rows without labels last), Last updated (newest first), Created (newest first) or Title (A–Z). The list view MUST show a sort picker above the rows that starts at the tab's default; a choice there holds per tab until the app restarts or the tab's default is changed. Ties keep GitLab order. In a grouped tab (FR-038) the sort applies to rows inside each week. Changing the sort MUST NOT reset the tab's baseline or notify.
 
 **Distribution**
 
@@ -285,9 +305,9 @@ As a developer, when something goes wrong I see a clear message, and I still get
 
 ### Key Entities
 
-- **Tab**: id, name, source URL, list type (merge requests / work items), notify-new-items, notify-new-comments, notify-changes, order.
+- **Tab**: id, name, source URL, list type (merge requests / work items), notify-new-items, notify-new-comments, notify-changes, test branch (MR tabs, FR-034), group by month and week (work-item tabs, FR-038), default sort (FR-039), order.
 - **Tab query**: what the URL translates into — scope (dashboard / group path / project path), list type and filter set; plus ignored parameters and validation errors.
-- **List item**: a merge request or work item with every displayed field (ref, title, author, dates, labels, assignees, reviewers + approval state, pipeline status, approvals, comment count, reactions, status, type, milestone, iteration, due date, weight, health, child progress, confidential, web URL, description preview).
+- **List item**: a merge request or work item with every displayed field (ref, title, author, dates, labels, assignees, reviewers + approval state, pipeline status, approvals, comment count, reactions, status, type, milestone, iteration, due date, weight, health, child progress, confidential, closed date, web URL, description preview).
 - **Tab state**: last result (item ids, comment counts and each item's tracked state: pipeline status, approval state, review state, MR state, work-item status, labels), baseline-established flag,  set of NEW item ids, set of items with new comments, last error/warning, last updated time.
 - **Seen while visible**: the global set of items whose markers appeared while their tab was on screen. They're shown but never counted in any badge or the menu bar (FR-023a).
 - **Seen comments**: the global set of comment ids already processed, used to de-duplicate across tabs and restarts.
@@ -300,7 +320,7 @@ As a developer, when something goes wrong I see a clear message, and I still get
 ### Measurable Outcomes
 
 - **SC-001**: Clicking the menu bar icon shows (or brings forward) the window in under 0.5 s, and clicking it again while the window is in front hides it every time.
-- **SC-002**: All 4 default tabs show the same items as the matching GitLab web pages (100% match on item set, and on order for every sort the app supports).
+- **SC-002**: All 6 default tabs show the same items as the matching GitLab web pages (100% match on item set, and on order for every sort the app supports).
 - **SC-003**: A newly matching MR or work item produces a notification within one polling interval (≤ 2 minutes at the default setting).
 - **SC-004**: A comment by someone else on a tracked MR or work item produces exactly one notification within one interval. The user's own comments and system notes produce zero.
 - **SC-004a**: An @mention of the user by someone else, on any item, produces exactly one notification within one interval.
@@ -323,6 +343,7 @@ As a developer, when something goes wrong I see a clear message, and I still get
 - Stack is fixed by the user: Tauri 2 (Rust side does the GitLab requests, polling, notifications, badge and Keychain), Vue 3 + TypeScript + Vite for screens. GraphQL is used for both list types; REST only for commit ancestry, which GraphQL doesn't offer (FR-034, research R18).
 - Team conventions the MR features rely on (hard-coded in v1, could become settings later):
   - A work item's workflow state is its scoped label `state::<value>` (e.g. "In Development", "Ready for Testing", "In Testing", "Ready to Merge"); the value that allows merging is exactly "Ready to Merge", compared case-insensitively (FR-036).
+  - Weeks run Monday to Sunday, in the Mac's local time (FR-038).
   - A branch name starts with the number of the work item (ticket) it resolves, e.g. `19368-email-subjects-…` (FR-036, FR-036b).
   - Branches reach a test branch (e.g. `resource-test`) through ordinary merge commits titled "Merge branch '<name>' …" (FR-034); squashes and cherry-picks aren't detected.
 - Out of scope for v1: notifications for changes other than those in FR-022a (e.g. assignee, milestone or due-date changes), start at login, multiple GitLab servers, grouping/sorting inside the app beyond the URL's sort, write actions.

@@ -24,7 +24,7 @@ fn missing_file_gives_default_without_warning() {
     let dir = tempfile::tempdir().unwrap();
     let loaded = load_or_default::<Settings>(&dir.path().join("nope.json"));
     assert!(loaded.warning.is_none());
-    assert_eq!(loaded.value.tabs.len(), 4);
+    assert_eq!(loaded.value.tabs.len(), 6);
 }
 
 #[test]

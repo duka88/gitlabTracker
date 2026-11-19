@@ -278,6 +278,26 @@ description: "Task list for GitLab Tracker menu bar app"
 
 ---
 
+## Phase 9c: Weekly done-ticket counts (2026-11-05)
+
+**Goal**: Group a work-item tab by month and then by week, with counts per month and week, so the team sees how many tickets it closed each week (FR-038).
+
+**Independent Test**: quickstart.md V28.
+
+- [X] T119 Add `closedAt` to the two work-item queries, `ListItem.closed_at` (parsed for work items, `None` for MRs) and `Tab.group_by_week` (serde default false; kept only on work-item tabs in `apply_tab_edits`; not part of the fingerprint); tests for parsing `closedAt` and for the tab rule (FR-038), in src-tauri/src/gitlab/queries/work_items_*.graphql, src-tauri/src/model/item.rs, src-tauri/src/model/tab.rs, src-tauri/src/gitlab/parse.rs, src-tauri/src/app_state.rs, src-tauri/tests/common/mod.rs, src-tauri/tests/parse_test.rs and src-tauri/tests/tabs_test.rs
+- [X] T120 [P] Add the pure `groupByMonthWeek(items)` (closed date else updated date, local time, Monday weeks split at month ends, newest first, URL order kept inside a week, labels and counts) with unit tests for month-boundary weeks, Sunday/Monday edges and the updated-date fallback (FR-038), in src/util/groups.ts and src/util/__tests__/groups.test.ts
+- [X] T121 Add `closedAt` and `groupByWeek` to the TS types, and render grouped tabs in TabList with month and week headings and counts, clickable to collapse or expand (FR-038), in src/types.ts and src/components/TabList.vue
+- [X] T122 Add a "Group by month and week" checkbox to work-item tabs in the tab editor, sent as `groupByWeek`; ticking it also turns off the tab's three notify switches (FR-038), in src/components/settings/TabEditor.vue
+- [X] T123 Sync the design docs: `Tab.group_by_week` and `ListItem.closed_at` in data-model.md, `Tab.groupByWeek` in contracts/tauri-ipc.md, `closedAt` in contracts/gitlab-graphql.md, and a new check V28 in quickstart.md (a "Done" tab with my closed-tickets URL, `state=closed&assignee_username[]=DusanJ88&sort=closed_at_desc`)
+- [X] T125 Add the fifth default tab "Done" (`https://gitlab.com/groups/login5/-/work_items?state=closed&assignee_username[]=DusanJ88&sort=closed_at_desc`, `group_by_week: true`, all notify switches off) to `default_tabs`, update the "Replace all tabs with the defaults?" text and the tests that count or index default tabs; test that it parses as a closed work-item list sorted by closed date (FR-015, FR-038), in src-tauri/src/model/tab.rs, src/components/settings/TabEditor.vue, src-tauri/tests/store_test.rs and src-tauri/tests/url_map_test.rs
+- [X] T126 Add "On resource-test" as the second default tab (My MRs URL, `test_branch: resource-test`, notifications on), update the reset text to 6 and the tests that count or index default tabs (FR-015, FR-034), in src-tauri/src/model/tab.rs, src/components/settings/TabEditor.vue, src-tauri/tests/store_test.rs, src-tauri/tests/url_map_test.rs and src-tauri/tests/tabs_test.rs
+- [X] T127 [P] Add `periodKeys(date)` (month and week keys for a date, shared by the grouping) and `monthsBack(monthKey, n)` to the grouping util, with tests for today's keys and the 12-month window across a year boundary (FR-038), in src/util/groups.ts and src/util/__tests__/groups.test.ts
+- [X] T128 In TabList, start every month and week collapsed except the current ones (expanded/collapsed toggles kept per tab until restart), show only the last 12 months with a "Show more (N tickets)" button adding 12 months per click, and reveal a highlighted row's month and week (FR-038), in src/components/TabList.vue
+- [X] T129 Update quickstart V28 for the collapsed-by-default headings and the 12-month window with "Show more", in quickstart.md
+- [ ] T124 Run quickstart V28 on the dev build (and V5 for the Done and On resource-test tabs after "Reset to defaults")
+
+---
+
 ## Phase 10: Polish & Cross-Cutting Concerns
 
 - [X] T097 [P] Write README.md (what it is, prerequisites, token scope, dev and build commands, allowing notifications, Gatekeeper "Open anyway", where data lives, VERIFY results link)
@@ -301,6 +321,7 @@ description: "Task list for GitLab Tracker menu bar app"
 - **US6 (Phase 8)**: Depends on Foundational + US1 (`parse_tab_url`). Can run in parallel with US2–US5.
 - **US7 (Phase 9)**: Depends on US1. Can run in parallel with US2+.
 - **Phase 9b (T103–T116)**: Fixes and features from the first manual run (2026-11-04). Depends on US1, US2 (visible-tab rule, notifications), US6 (tab editor) and US7 (warning bars). Within it: T110 → T112 → T114 → T115 (MR status → ticket → ticket fallback → layout); T111 → T113 (test-branch tab → global flag); T116 after T103–T115; T107 last.
+- **Phase 9c (T119–T129)**: Weekly done-ticket counts (2026-11-05). Depends on US1 (TabList) and US6 (tab editor). T119 → T121 → T122; T120 can run in parallel with T119; T125 after T119; T126 after T125; T127 → T128 → T129; T123 after T119–T122; T124 last.
 - **Polish (Phase 10)**: After all the chosen stories.
 
 ### Story completion order

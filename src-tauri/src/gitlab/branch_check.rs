@@ -44,26 +44,23 @@ fn enc(s: &str) -> String {
 
 /// Merge commits from a `repository/commits` response, newest first.
 pub fn parse_merges(commits: &Value) -> Vec<BranchMerge> {
-    commits
-        .as_array()
-        .map(|a| {
-            a.iter()
-                .filter_map(|c| {
-                    let parents = c.get("parent_ids")?.as_array()?;
-                    let merged_head = parents.get(1)?.as_str()?.to_string();
-                    Some(BranchMerge {
-                        title: c.get("title")?.as_str()?.to_string(),
-                        merged_head,
-                        at: c
-                            .get("committed_date")
-                            .and_then(Value::as_str)
-                            .and_then(|d| DateTime::parse_from_rfc3339(d).ok())
-                            .map(|d| d.with_timezone(&Utc)),
-                    })
+    commits.as_array().map_or_default(|a| {
+        a.iter()
+            .filter_map(|c| {
+                let parents = c.get("parent_ids")?.as_array()?;
+                let merged_head = parents.get(1)?.as_str()?.to_string();
+                Some(BranchMerge {
+                    title: c.get("title")?.as_str()?.to_string(),
+                    merged_head,
+                    at: c
+                        .get("committed_date")
+                        .and_then(Value::as_str)
+                        .and_then(|d| DateTime::parse_from_rfc3339(d).ok())
+                        .map(|d| d.with_timezone(&Utc)),
                 })
-                .collect()
-        })
-        .unwrap_or_default()
+            })
+            .collect()
+    })
 }
 
 /// Newest merge of `source_branch`, matched on git's merge title
@@ -212,8 +209,7 @@ async fn check(
         pb.merges = Some(
             get_opt(client, &path)
                 .await?
-                .map(|v| parse_merges(&v))
-                .unwrap_or_default(),
+                .map_or_default(|v| parse_merges(&v)),
         );
     }
     let last = pb

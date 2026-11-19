@@ -5,7 +5,7 @@ use gitlab_tracker_lib::model::{ListKind, PersistedState, TabState, default_tabs
 fn state_with_baselines(tabs: &[gitlab_tracker_lib::model::Tab]) -> PersistedState {
     let mut st = PersistedState::default();
     for t in tabs {
-        let mut ts = TabState::for_url(&t.url);
+        let mut ts = TabState::for_url(&t.fingerprint_source());
         ts.baseline_done = true;
         st.tabs.insert(t.id.clone(), ts);
     }
@@ -95,16 +95,16 @@ fn test_branch_is_normalized_and_resets_baseline() {
     let mut st = state_with_baselines(&tabs);
     let mut edited = tabs.clone();
     edited[0].test_branch = Some("  resource-test ".into()); // "My MRs" (MR tab)
-    edited[2].test_branch = Some("resource-test".into()); // work-item tab: dropped
-    edited[1].test_branch = Some("   ".into()); // blank: dropped
+    edited[3].test_branch = Some("resource-test".into()); // work-item tab: dropped
+    edited[2].test_branch = Some("   ".into()); // "Reviewing", blank: dropped
     let out = apply_tab_edits(edited, &mut st).unwrap();
     assert_eq!(out[0].test_branch.as_deref(), Some("resource-test"));
-    assert_eq!(out[1].test_branch, None);
-    assert_eq!(out[2].kind, ListKind::WorkItems);
     assert_eq!(out[2].test_branch, None);
+    assert_eq!(out[3].kind, ListKind::WorkItems);
+    assert_eq!(out[3].test_branch, None);
     assert!(!st.tabs[&tabs[0].id].baseline_done);
-    assert!(st.tabs[&tabs[1].id].baseline_done);
     assert!(st.tabs[&tabs[2].id].baseline_done);
+    assert!(st.tabs[&tabs[3].id].baseline_done);
 
     // Saving again unchanged keeps the new baseline id.
     let fp = st.tabs[&tabs[0].id].url_fingerprint.clone();
@@ -132,4 +132,40 @@ fn global_test_branch_is_normalized() {
     assert_eq!(normalize_branch(Some("  ".into())), None);
     assert_eq!(normalize_branch(Some("a b".into())), None);
     assert_eq!(normalize_branch(None), None);
+}
+
+/// Month/week grouping is kept only on work-item tabs and doesn't reset the baseline.
+#[test]
+fn group_by_week_only_on_work_item_tabs() {
+    let tabs = default_tabs();
+    let mut st = state_with_baselines(&tabs);
+    let mut edited = tabs.clone();
+    edited[0].group_by_week = true; // MR tab: dropped
+    edited[3].group_by_week = true; // work-item tab: kept
+    let out = apply_tab_edits(edited, &mut st).unwrap();
+    assert!(!out[0].group_by_week);
+    assert!(out[3].group_by_week);
+    assert!(st.tabs[&tabs[3].id].baseline_done);
+}
+
+/// A tab's default sort is kept on save, doesn't reset the baseline, and defaults to GitLab order
+/// for tabs saved before the field existed.
+#[test]
+fn tab_sort_is_kept_and_defaults_to_gitlab() {
+    use gitlab_tracker_lib::model::TabSort;
+    let tabs = default_tabs();
+    let mut st = state_with_baselines(&tabs);
+    let mut edited = tabs.clone();
+    edited[0].sort = TabSort::Label;
+    edited[3].sort = TabSort::Updated;
+    let out = apply_tab_edits(edited, &mut st).unwrap();
+    assert_eq!(out[0].sort, TabSort::Label);
+    assert_eq!(out[3].sort, TabSort::Updated);
+    assert!(st.tabs[&tabs[0].id].baseline_done);
+
+    let json = r#"{"id":"x","name":"n","url":"u","kind":"workItems"}"#;
+    let old: gitlab_tracker_lib::model::Tab = serde_json::from_str(json).unwrap();
+    assert_eq!(old.sort, TabSort::Gitlab);
+    let v = serde_json::to_value(&out[0]).unwrap();
+    assert_eq!(v["sort"], "label");
 }

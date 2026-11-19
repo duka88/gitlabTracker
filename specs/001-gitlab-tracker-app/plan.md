@@ -83,7 +83,7 @@ src/                                   # Vue 3 + TS (screens only)
 ├── types.ts                           # mirrors Rust view types
 ├── ipc.ts                             # typed invoke/listen wrappers
 ├── store.ts                           # useAppState() composable fed by state://updated
-├── util/{time.ts, labels.ts, text.ts} # relative time, scoped label split, truncation
+├── util/{time.ts, labels.ts, text.ts, groups.ts} # relative time, scoped label split, truncation, month/week grouping (FR-038)
 ├── components/
 │   ├── TabBar.vue                     # tabs + count + new badge, refresh spinner, settings, bell
 │   ├── BellPopup.vue

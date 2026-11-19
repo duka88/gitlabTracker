@@ -13,7 +13,7 @@ All types live in Rust (`src-tauri/src/model/`) and derive `Serialize`/`Deserial
 | `interval_minutes` | `u8` | One of 1, 2, 5, 10. Default 2 (FR-008). |
 | `notify_mentions` | `bool` | Default `true` (FR-022e). |
 | `user` | `Option<UserInfo>` | Set after a successful token test. Cleared when the token is removed. |
-| `tabs` | `Vec<Tab>` | Ordered. On first start, the 4 defaults (FR-015, research R14). |
+| `tabs` | `Vec<Tab>` | Ordered. On first start, the 6 defaults (FR-015, research R14). |
 | `schema_version` | `u32` | For migrations. Starts at 1. |
 
 The host is fixed to `https://gitlab.com` in v1 (constant `GITLAB_HOST`, research R17). The token is **not** stored here. It's in the Keychain, under service `com.duka88.gitlab-tracker` and account `gitlab-token:gitlab.com`.
@@ -36,6 +36,8 @@ Added 2026-11-04: `test_branch: Option<String>`, the branch flagged on every MR 
 | `notify_new_comments` | `bool` | Allowed on every tab type (clarification, round 2). |
 | `notify_changes` | `bool` | |
 | `test_branch` | `Option<String>` | MR tabs only: show just the MRs merged into this branch (FR-034). Trimmed; no whitespace; dropped on work-item tabs. |
+| `group_by_week` | `bool` (default `false`) | Work-item tabs only: the UI groups rows by month and week with counts (FR-038). Dropped on MR tabs. Not part of the fingerprint, so toggling it doesn't reset the baseline. |
+| `sort` | `TabSort` enum: `gitlab` \| `label` \| `updated` \| `created` \| `title` (default `gitlab`) | The tab's default row order, applied in the UI (FR-039). Doesn't reset the baseline. |
 
 Changing `url` or `test_branch` resets that tab's `TabState` (no notifications on the next load, FR-019). The `TabState` fingerprint is taken over `url` plus `\ntest_branch=<b>` when a test branch is set (`Tab::fingerprint_source`).
 
@@ -52,6 +54,7 @@ Common fields:
 - `kind`, `iid`, `reference` (`!123` / `#45`)
 - `title`, `web_url`, `project_path`
 - `author: Person`, `created_at`, `updated_at`
+- `closed_at: Option<DateTime<Utc>>` (work items: GitLab `closedAt`; `None` for MRs; `#[serde(default)]` so older `state.json` loads). Groups rows in FR-038 tabs, falling back to `updated_at`.
 - `labels: Vec<Label>`, `assignees: Vec<Person>`, `milestone: Option<String>`
 - `comment_count: Option<u32>`, `upvotes`, `downvotes`
 - `description_preview: String` (≤300 characters of plain text)

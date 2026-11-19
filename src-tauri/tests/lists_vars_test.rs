@@ -17,7 +17,7 @@ fn my_mrs_vars() {
 
 #[test]
 fn my_tickets_vars_with_and_without_status() {
-    let q = parse_tab_url(&default_tabs()[2].url).unwrap();
+    let q = parse_tab_url(&default_tabs()[3].url).unwrap();
     let with = variables(&q, Some("CUR"), true);
     assert_eq!(
         with,

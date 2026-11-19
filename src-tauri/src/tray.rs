@@ -95,6 +95,7 @@ pub fn show_window(app: &AppHandle) {
     // event the icon position is unknown (first run): center instead.
     if !PLACED.load(Ordering::Relaxed) {
         if win.move_window(Position::TrayBottomCenter).is_ok() {
+            keep_on_screen(&win);
             PLACED.store(true, Ordering::Relaxed);
         } else {
             let _ = win.center();
@@ -108,6 +109,24 @@ pub fn show_window(app: &AppHandle) {
         let mut c = core.lock().await;
         mark_window_seen(&app, &mut c);
     });
+}
+
+/// Shifts the window left/right so it fits on its monitor; a wide window centered under an
+/// icon near the screen edge would otherwise hang off it.
+fn keep_on_screen(win: &tauri::WebviewWindow) {
+    let (Ok(Some(mon)), Ok(pos), Ok(size)) = (
+        win.current_monitor(),
+        win.outer_position(),
+        win.outer_size(),
+    ) else {
+        return;
+    };
+    let left = mon.position().x;
+    let right = left + mon.size().width as i32;
+    let x = pos.x.min(right - size.width as i32).max(left);
+    if x != pos.x {
+        let _ = win.set_position(tauri::PhysicalPosition::new(x, pos.y));
+    }
 }
 
 /// The user is looking at the window again (shown, or refocused while open): the active

@@ -37,7 +37,7 @@ Added 2026-11-04: `test_branch: Option<String>`, the branch flagged on every MR 
 | `notify_changes` | `bool` | |
 | `test_branch` | `Option<String>` | MR tabs only: show just the MRs merged into this branch (FR-034). Trimmed; no whitespace; dropped on work-item tabs. |
 | `group_by_week` | `bool` (default `false`) | Work-item tabs only: the UI groups rows by month and week with counts (FR-038). Dropped on MR tabs. Not part of the fingerprint, so toggling it doesn't reset the baseline. |
-| `sort` | `TabSort` enum: `gitlab` \| `label` \| `updated` \| `created` \| `title` (default `gitlab`) | The tab's default row order, applied in the UI (FR-039). Doesn't reset the baseline. |
+| `sort` | `TabSort` enum: `gitlab` \| `label` \| `updated` \| `created` \| `title` \| `priority` \| `stage` (default `gitlab`) | The tab's default row order, applied in the UI (FR-039). Doesn't reset the baseline. |
 
 Changing `url` or `test_branch` resets that tab's `TabState` (no notifications on the next load, FR-019). The `TabState` fingerprint is taken over `url` plus `\ntest_branch=<b>` when a test branch is set (`Tab::fingerprint_source`).
 

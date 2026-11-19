@@ -3,7 +3,7 @@
 export type ListKind = "mergeRequests" | "workItems";
 
 /** Row order in the list view; sorted in the UI. `gitlab` keeps the URL's order. */
-export type TabSort = "gitlab" | "label" | "updated" | "created" | "title";
+export type TabSort = "gitlab" | "label" | "updated" | "created" | "title" | "priority" | "stage";
 
 export interface Tab {
   id: string;

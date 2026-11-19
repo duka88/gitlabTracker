@@ -46,4 +46,34 @@ describe("sortItems", () => {
     expect(iids(sortItems(items, "created"))).toBe("3,1,2,4");
     expect(iids(sortItems(items, "title"))).toBe("2,1,4,3");
   });
+
+  it("sorts by priority (P1 first, none last), ties by stage", () => {
+    const items = [
+      item(1, { labelTitles: ["priority::P3"] }),
+      item(2),
+      item(3, { labelTitles: ["priority::P1", "state::In Testing"] }),
+      item(4, { labelTitles: ["Priority::P1", "state::In Development"] }),
+      item(5, { labelTitles: ["priority::P10"] }),
+      item(6, { labelTitles: ["priority::P2"] }),
+    ];
+    expect(iids(sortItems(items, "priority"))).toBe("4,3,6,1,5,2");
+  });
+
+  it("sorts by stage in workflow order, ties by priority, MRs use the linked ticket", () => {
+    const mr: ListItem = {
+      ...item(7),
+      kind: "mergeRequests",
+      mr: { ticket: { stateLabel: { ...label("state::Ready for Testing"), value: "Ready for Testing" } } } as ListItem["mr"],
+    };
+    const items = [
+      item(1, { labelTitles: ["state::Ready to Merge"] }),
+      item(2, { labelTitles: ["state::In Testing", "priority::P3"] }),
+      item(3),
+      item(4, { labelTitles: ["state::In Development"] }),
+      item(5, { labelTitles: ["state::Blocked"] }),
+      item(6, { labelTitles: ["state::In Testing", "priority::P1"] }),
+      mr,
+    ];
+    expect(iids(sortItems(items, "stage"))).toBe("4,7,6,2,1,5,3");
+  });
 });

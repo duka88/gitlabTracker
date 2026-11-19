@@ -51,6 +51,11 @@ pub enum TabSort {
     Created,
     /// Title, A–Z.
     Title,
+    /// `priority::` label, P1 first; ties by stage.
+    Priority,
+    /// `state::` label in workflow order (In Development → Ready for Testing → In Testing →
+    /// Ready to Merge); ties by priority.
+    Stage,
 }
 
 fn yes() -> bool {

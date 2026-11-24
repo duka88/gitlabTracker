@@ -45,7 +45,9 @@ function setFilter(key: keyof RowFilters, e: Event) {
 }
 const isMrTab = computed(() => activeTab.value?.tab.kind === "mergeRequests");
 const hasEnvs = computed(() => (state.view?.trackedEnvs.length ?? 0) > 0);
-const filtering = computed(() => filters.value.notApproved || filters.value.notDeployed);
+// MR tabs flagged with the global test branch (a tab filtered by its own branch shows only MRs on it).
+const testBranch = computed(() => (isMrTab.value && !activeTab.value?.tab.testBranch ? state.view?.testBranch ?? null : null));
+const filtering = computed(() => Object.values(filters.value).some(Boolean));
 const items = computed(() => sortItems(filterItems(activeTab.value?.items ?? [], filters.value), sort.value));
 
 const MONTH_STEP = 12;
@@ -108,13 +110,21 @@ watch(
       <IssueBar v-if="activeTab.error" :issue="activeTab.error" />
       <IssueBar v-if="activeTab.warning" :issue="activeTab.warning" warning />
       <div v-if="activeTab.items.length > 0" class="toolbar">
-        <label v-if="isMrTab" class="check" title="Only MRs that aren't approved yet">
+        <label v-if="isMrTab" class="check" title="MRs that aren't approved yet">
           <input type="checkbox" :checked="filters.notApproved" @change="setFilter('notApproved', $event)" />
           Not approved
         </label>
-        <label v-if="hasEnvs" class="check" title="Only rows not deployed on any tracked environment (outdated counts as not deployed)">
+        <label v-if="hasEnvs" class="check" title="Rows not on any tracked environment">
           <input type="checkbox" :checked="filters.notDeployed" @change="setFilter('notDeployed', $event)" />
           Not deployed
+        </label>
+        <label v-if="testBranch" class="check" :title="`MRs not merged into ${testBranch}`">
+          <input type="checkbox" :checked="filters.notOnTestBranch" @change="setFilter('notOnTestBranch', $event)" />
+          Not on {{ testBranch }}
+        </label>
+        <label v-if="testBranch || hasEnvs" class="check" title="Rows on the test branch or an environment with newer commits not there yet">
+          <input type="checkbox" :checked="filters.outdated" @change="setFilter('outdated', $event)" />
+          Outdated
         </label>
         <span v-if="filtering" class="shown">{{ items.length }} of {{ activeTab.items.length }}</span>
         <span class="grow" />

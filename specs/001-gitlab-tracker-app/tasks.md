@@ -311,6 +311,8 @@ claude
 - [X] T134 Print tracked envs (plus `EXTRA_ENVS`) and the rows on them in the live check; checked against gitlab.com: qa-1 = `resource-test`, 13 of the user's MRs on it (2 outdated) (FR-040), in src-tauri/examples/live_check.rs
 - [ ] T135 Run the Independent Test above on the dev build, including a deploy notification
 - [X] T136 Add "Not approved" and "Not deployed" filter checkboxes to the list toolbar, per tab until restart, with "N of M" and an empty-filter message; pure `filterItems` with tests (FR-041), in src/util/filter.ts, src/util/__tests__/filter.test.ts and src/components/TabList.vue
+- [X] T137 Add a "Not on <test branch>" filter checkbox to MR tabs without their own test branch while the global test branch is set, outdated counting as not on it, with a test (FR-041), in src/util/filter.ts, src/util/__tests__/filter.test.ts and src/components/TabList.vue
+- [X] T138 Add an "Outdated" filter (outdated on the test branch or any env), make "Not deployed" / "Not on <test branch>" mean not there at all, and combine all filters with OR, with tests (FR-041), in src/util/filter.ts, src/util/__tests__/filter.test.ts and src/components/TabList.vue
 
 ---
 

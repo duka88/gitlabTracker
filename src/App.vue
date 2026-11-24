@@ -4,6 +4,7 @@ import { onMounted } from "vue";
 import { useAppState } from "./store";
 import TabBar from "./components/TabBar.vue";
 import TabList from "./components/TabList.vue";
+import EnvList from "./components/EnvList.vue";
 import Footer from "./components/Footer.vue";
 import IssueBar from "./components/IssueBar.vue";
 import SettingsView from "./components/settings/SettingsView.vue";
@@ -19,7 +20,8 @@ onMounted(() => void start());
     <template v-else>
       <TabBar />
       <IssueBar v-if="state.view.globalError" :issue="state.view.globalError" :warning="state.view.globalError.kind === 'rateLimited'" />
-      <TabList />
+      <EnvList v-if="state.envsOpen" />
+      <TabList v-else />
       <Footer />
     </template>
   </div>

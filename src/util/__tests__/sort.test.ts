@@ -76,4 +76,14 @@ describe("sortItems", () => {
     ];
     expect(iids(sortItems(items, "stage"))).toBe("4,7,6,2,1,5,3");
   });
+
+  it("sorts by approval: approved first, then fewest needed, then most given, no MR last", () => {
+    const mr = (n: number, approved: boolean, required: number, given: number): ListItem => ({
+      ...item(n),
+      kind: "mergeRequests",
+      mr: { approvals: { approved, required, given } } as ListItem["mr"],
+    });
+    const items = [item(1), mr(2, false, 2, 0), mr(3, true, 1, 1), mr(4, false, 2, 1), mr(5, true, 0, 2), mr(6, false, 0, 0)];
+    expect(iids(sortItems(items, "approval"))).toBe("5,3,6,4,2,1");
+  });
 });

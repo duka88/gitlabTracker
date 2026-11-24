@@ -65,7 +65,7 @@ description: "Task list for GitLab Tracker menu bar app"
 - [X] T023 [P] Add the `GITLAB_HOST` constant (`https://gitlab.com`, research R17) and the helpers `absolute_url(path)` and `avatar_proxy_url(url)`, in src-tauri/src/config.rs
 
 ### App core, poller, IPC, tray, UI shell
-
+claude
 - [X] T024 Implement `Core` (settings, global state, tab states, notification log, `active_tab_id`, `window_visible`) behind `Arc<tokio::sync::Mutex<_>>`, with `build_view()` and `emit_view(app)` (event `state://updated`), in src-tauri/src/app_state.rs
 - [X] T025 Implement the poller skeleton: a tokio task with `interval(settings.interval)` and `MissedTickBehavior::Delay`, a `Notify` for refresh, an `AtomicBool` in-flight guard (FR-018), emitting `poll://started`, calling a `run_poll(core)` stub, and restarting the interval on `set_interval`, in src-tauri/src/engine/poller.rs
 - [X] T026 Add a wake-from-sleep watchdog: every 30 s compare `SystemTime::now()` with the previous reading, and on a jump of more than 60 s trigger one refresh through the poller's `Notify` (the in-flight guard prevents bursts), per research R11, in src-tauri/src/engine/poller.rs
@@ -295,6 +295,21 @@ description: "Task list for GitLab Tracker menu bar app"
 - [X] T128 In TabList, start every month and week collapsed except the current ones (expanded/collapsed toggles kept per tab until restart), show only the last 12 months with a "Show more (N tickets)" button adding 12 months per click, and reveal a highlighted row's month and week (FR-038), in src/components/TabList.vue
 - [X] T129 Update quickstart V28 for the collapsed-by-default headings and the 12-month window with "Show more", in quickstart.md
 - [ ] T124 Run quickstart V28 on the dev build (and V5 for the Done and On resource-test tabs after "Reset to defaults")
+
+---
+
+## Phase 9d: What's deployed on which env (2026-11-24)
+
+**Goal**: Track GitLab deployment environments (default qa-1) instead of the manual env sheet: an Envs tab, env chips on MR and ticket rows, and a notification per new deployment (FR-040).
+
+**Independent Test**: Settings → Environments lists `login5/login-eko/login-eko qa-1`; the Envs tab shows qa-1's deployed ref, commit, deployer and time, and the MRs on it; those MRs show a "qa-1" chip; adding `qa-5` shows its `14337-…` branch and chips #14337 when it's in a tab.
+
+- [X] T130 Add `TrackedEnv`, `EnvStatus`, `EnvDeployment`, `EnvBadge`, `normalize_envs` and `default_tracked_envs`; `Settings.tracked_envs`, `PersistedState.envs`, `ListItem.envs`, `NotificationKind::Deploy` and the view fields (FR-040), in src-tauri/src/model/env.rs, src-tauri/src/model/settings.rs, src-tauri/src/model/state.rs, src-tauri/src/model/item.rs, src-tauri/src/model/notification.rs, src-tauri/src/model/view.rs and src-tauri/src/app_state.rs
+- [X] T131 Fetch each env's state and latest successful deployment over REST, and set env chips on every row: deployed-branch match, else the FR-034 ancestry check against the deployed commit (`check` now reads history from the commit, results cached per label), tickets via their MRs and via `<iid>-…` deployed branches (FR-040), in src-tauri/src/gitlab/envs.rs, src-tauri/src/gitlab/branch_check.rs and src-tauri/tests/envs_test.rs
+- [X] T132 Fetch envs alongside the tabs in each poll, flag rows across all tabs, merge into `state.envs` (keep last deployment on error, drop untracked) and notify on a new deployment id after a silent baseline; add `set_tracked_envs` (FR-040), in src-tauri/src/engine/env_watch.rs, src-tauri/src/engine/poller.rs, src-tauri/src/commands.rs and src-tauri/src/lib.rs
+- [X] T133 Add the Envs tab (env cards with ref, commit → deploy job, deployer, time, rows on it → jump to row), env chips on MR and work-item rows, and the Settings "Environments" editor (FR-040), in src/types.ts, src/ipc.ts, src/store.ts, src/App.vue, src/components/TabBar.vue, src/components/EnvList.vue, src/components/EnvChips.vue, src/components/MrRow.vue, src/components/WorkItemRow.vue, src/components/settings/EnvEditor.vue and src/components/settings/SettingsView.vue
+- [X] T134 Print tracked envs (plus `EXTRA_ENVS`) and the rows on them in the live check; checked against gitlab.com: qa-1 = `resource-test`, 13 of the user's MRs on it (2 outdated) (FR-040), in src-tauri/examples/live_check.rs
+- [ ] T135 Run the Independent Test above on the dev build, including a deploy notification
 
 ---
 

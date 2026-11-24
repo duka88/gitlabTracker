@@ -3,7 +3,7 @@
 export type ListKind = "mergeRequests" | "workItems";
 
 /** Row order in the list view; sorted in the UI. `gitlab` keeps the URL's order. */
-export type TabSort = "gitlab" | "label" | "updated" | "created" | "title" | "priority" | "stage";
+export type TabSort = "gitlab" | "label" | "updated" | "created" | "title" | "priority" | "stage" | "approval";
 
 export interface Tab {
   id: string;
@@ -90,6 +90,36 @@ export interface OnBranch {
   mergedAt: string | null;
 }
 
+/** A row is deployed on a tracked env (FR-040). */
+export interface EnvBadge {
+  env: string;
+  /** False when the MR has commits newer than what's deployed. */
+  upToDate: boolean;
+}
+
+export interface TrackedEnv {
+  project: string;
+  name: string;
+}
+
+export interface EnvDeployment {
+  id: number;
+  ref: string;
+  sha: string;
+  finishedAt: string | null;
+  user: string | null;
+  jobUrl: string | null;
+}
+
+export interface EnvStatus {
+  env: TrackedEnv;
+  webUrl: string | null;
+  state: string | null;
+  deployment: EnvDeployment | null;
+  error: string | null;
+  checkedAt: string | null;
+}
+
 export interface MrFields {
   draft: boolean;
   targetBranch: string;
@@ -142,6 +172,8 @@ export interface ListItem {
   descriptionPreview: string;
   mr?: MrFields;
   workItem?: WorkItemFields;
+  /** Tracked envs this item is deployed on (FR-040). */
+  envs?: EnvBadge[];
 }
 
 export type ChangeKind =
@@ -180,6 +212,9 @@ export interface AppView {
   intervalMinutes: number;
   notifyMentions: boolean;
   testBranch: string | null;
+  trackedEnvs: TrackedEnv[];
+  /** One per tracked env, in Settings order. */
+  envs: EnvStatus[];
   polling: boolean;
   lastPollAt: string | null;
   activeTabId: string | null;
@@ -189,7 +224,7 @@ export interface AppView {
   globalError: Issue | null;
 }
 
-export type NotificationKind = "newItem" | "newItems" | "comment" | "change" | "mention";
+export type NotificationKind = "newItem" | "newItems" | "comment" | "change" | "mention" | "deploy";
 
 export interface NotificationEntry {
   id: string;

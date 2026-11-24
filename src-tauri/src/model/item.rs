@@ -1,6 +1,7 @@
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::env::EnvBadge;
 use super::tab::ListKind;
 
 /// A row in a tab: an MR or a work item (data-model.md "`ListItem`").
@@ -35,6 +36,9 @@ pub struct ListItem {
     pub mr: Option<MrFields>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub work_item: Option<WorkItemFields>,
+    /// Tracked envs this item is deployed on (FR-040).
+    #[serde(default)]
+    pub envs: Vec<EnvBadge>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

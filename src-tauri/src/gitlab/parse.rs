@@ -350,6 +350,7 @@ pub fn mr_to_item(mr: &MrRaw) -> ListItem {
             merge_status: merge_status(mr),
         }),
         work_item: None,
+        envs: Vec::new(),
     }
 }
 
@@ -505,6 +506,7 @@ pub fn work_item_to_item(wi: &WorkItemRaw) -> ListItem {
             health,
             children,
         }),
+        envs: Vec::new(),
     }
 }
 

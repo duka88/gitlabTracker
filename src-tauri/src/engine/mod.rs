@@ -1,4 +1,5 @@
 pub mod diff;
+pub mod env_watch;
 pub mod notifier;
 pub mod notify_text;
 pub mod poll;

@@ -7,6 +7,7 @@ import LabelChip from "./LabelChip.vue";
 import AvatarStack from "./AvatarStack.vue";
 import PipelineIcon from "./PipelineIcon.vue";
 import Icon from "./Icon.vue";
+import EnvChips from "./EnvChips.vue";
 import { formatDateTime, relativeTime } from "../util/time";
 import { useAppState } from "../store";
 
@@ -94,6 +95,7 @@ const onBranch = computed(() => {
             <span v-else class="mstatus neutral">{{ ticketState }}</span>
           </button>
           <span v-if="onBranch" class="mstatus" :class="onBranch.cls" :title="onBranch.title">{{ onBranch.text }}</span>
+          <EnvChips :envs="item.envs" />
           <span v-if="status" class="mstatus" :class="status.cls">{{ status.text }}</span>
         </div>
         <div class="side-line">

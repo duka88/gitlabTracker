@@ -90,6 +90,7 @@ pub fn mr(n: u32) -> ListItem {
             merge_status: None,
         }),
         work_item: None,
+        envs: Vec::new(),
     }
 }
 
@@ -128,6 +129,7 @@ pub fn wi(n: u32) -> ListItem {
             health: None,
             children: None,
         }),
+        envs: Vec::new(),
     }
 }
 

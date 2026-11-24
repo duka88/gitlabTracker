@@ -20,6 +20,8 @@ The host is fixed to `https://gitlab.com` in v1 (constant `GITLAB_HOST`, researc
 
 Added 2026-11-04: `test_branch: Option<String>`, the branch flagged on every MR (FR-037). Trimmed; blank or with whitespace → `None` (`normalize_branch`).
 
+Added 2026-11-24: `tracked_envs: Vec<TrackedEnv { project, name }>` (FR-040), default `[login5/login-eko/login-eko qa-1]`. `normalize_envs` trims, strips a pasted `https://gitlab.com/` prefix, drops blank rows and duplicates; a row missing one part or with whitespace → error (on load: back to the default).
+
 ### UserInfo
 
 `id: String` (GraphQL gid), `username`, `name`, `avatar_url`.
@@ -37,7 +39,7 @@ Added 2026-11-04: `test_branch: Option<String>`, the branch flagged on every MR 
 | `notify_changes` | `bool` | |
 | `test_branch` | `Option<String>` | MR tabs only: show just the MRs merged into this branch (FR-034). Trimmed; no whitespace; dropped on work-item tabs. |
 | `group_by_week` | `bool` (default `false`) | Work-item tabs only: the UI groups rows by month and week with counts (FR-038). Dropped on MR tabs. Not part of the fingerprint, so toggling it doesn't reset the baseline. |
-| `sort` | `TabSort` enum: `gitlab` \| `label` \| `updated` \| `created` \| `title` \| `priority` \| `stage` (default `gitlab`) | The tab's default row order, applied in the UI (FR-039). Doesn't reset the baseline. |
+| `sort` | `TabSort` enum: `gitlab` \| `label` \| `updated` \| `created` \| `title` \| `priority` \| `stage` \| `approval` (default `gitlab`) | The tab's default row order, applied in the UI (FR-039). Doesn't reset the baseline. |
 
 Changing `url` or `test_branch` resets that tab's `TabState` (no notifications on the next load, FR-019). The `TabState` fingerprint is taken over `url` plus `\ntest_branch=<b>` when a test branch is set (`Tab::fingerprint_source`).
 
@@ -54,6 +56,7 @@ Common fields:
 - `kind`, `iid`, `reference` (`!123` / `#45`)
 - `title`, `web_url`, `project_path`
 - `author: Person`, `created_at`, `updated_at`
+- `envs: Vec<EnvBadge { env, up_to_date }>` (`#[serde(default)]`): tracked envs the row is deployed on, set on every row each poll (FR-040).
 - `closed_at: Option<DateTime<Utc>>` (work items: GitLab `closedAt`; `None` for MRs; `#[serde(default)]` so older `state.json` loads). Groups rows in FR-038 tabs, falling back to `updated_at`.
 - `labels: Vec<Label>`, `assignees: Vec<Person>`, `milestone: Option<String>`
 - `comment_count: Option<u32>`, `upvotes`, `downvotes`
@@ -107,12 +110,13 @@ Common fields:
 | `seen_mention_ids` | `BoundedSet<String>` (cap 2,000) | FR-022f |
 | `seen_while_visible` | `HashSet<gid>` | Items whose markers were created while their tab was visible in the open window (FR-023a). They're treated as seen everywhere: left out of **every** tab badge and the menu count, even after the window hides. A gid is removed once no tab has a marker for it any more. Persisted with the markers. |
 | `mentions_baseline_at` | `Option<DateTime>` | The first mention poll records this and sends nothing. |
+| `envs` | `HashMap<"<project>#<name>", EnvStatus>` | FR-040. `EnvStatus { env, web_url, state, deployment: Option<EnvDeployment { id, ref, sha, finished_at, user, job_url }>, error, checked_at }`. Last known deployment per tracked env and the baseline for deploy notifications: a different deployment `id` than the stored one notifies; no stored entry is a silent baseline. A failed fetch keeps the stored deployment. Entries for untracked envs are dropped. |
 
 Per-poll only (in memory, dropped after each poll): `poll_notified: HashSet<String>` with keys `new:<gid>` and `change:<gid>:<kind>`, so an item in several tabs notifies once per poll. Not persisted, so an item that leaves and comes back later, or a pipeline that fails again later, notifies again (spec edge cases).
 
 ## NotificationEntry (persisted: `notifications.json`, newest 100)
 
-`id` (UUID), `kind` (`NewItem | NewItems | Comment | Change | Mention`), `tab_id: Option<String>`, `item_gid: Option<String>`, `web_url`, `text`, `created_at`, `read: bool`.
+`id` (UUID), `kind` (`NewItem | NewItems | Comment | Change | Mention | Deploy`), `tab_id: Option<String>`, `item_gid: Option<String>`, `web_url`, `text`, `created_at`, `read: bool`.
 
 `NewItems` (the "3 new in My tickets" summary) has `tab_id` but no `item_gid`. Clicking it switches to the tab.
 

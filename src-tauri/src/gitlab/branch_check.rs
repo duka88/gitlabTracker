@@ -32,13 +32,14 @@ pub struct BranchMerge {
     pub at: Option<DateTime<Utc>>,
 }
 
-/// Results per (project, MR head, test-branch head): both shas fix the answer.
-type CacheKey = (String, String, String);
+/// Results per (label, project, MR head, branch head): the shas fix the answer, the label
+/// is what the result is called (a branch, or a deployment env, FR-040).
+type CacheKey = (String, String, String, String);
 static CACHE: LazyLock<Mutex<HashMap<CacheKey, Option<OnBranch>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 const CACHE_MAX: usize = 2000;
 
-fn enc(s: &str) -> String {
+pub(crate) fn enc(s: &str) -> String {
     utf8_percent_encode(s, NON_ALPHANUMERIC).to_string()
 }
 
@@ -77,7 +78,7 @@ pub fn find_branch_merge<'a>(
 }
 
 /// `Ok(None)` for a 404, so a missing branch or commit reads as "absent".
-async fn get_opt(client: &GitLabClient, path: &str) -> AppResult<Option<Value>> {
+pub(crate) async fn get_opt(client: &GitLabClient, path: &str) -> AppResult<Option<Value>> {
     match client.rest_get(path).await {
         Ok(v) => Ok(Some(v)),
         Err(AppError::NotFound(_)) => Ok(None),
@@ -86,7 +87,7 @@ async fn get_opt(client: &GitLabClient, path: &str) -> AppResult<Option<Value>> 
 }
 
 /// True when `ancestor` is reachable from `descendant`.
-async fn is_ancestor(
+pub(crate) async fn is_ancestor(
     client: &GitLabClient,
     project: &str,
     ancestor: &str,
@@ -104,9 +105,44 @@ async fn is_ancestor(
         .is_some_and(|id| id == ancestor))
 }
 
-struct ProjectBranch {
-    head: String,
+/// A commit to check MRs against: a branch head, or a deployed sha (FR-040).
+pub(crate) struct ProjectBranch {
+    pub head: String,
     merges: Option<Vec<BranchMerge>>,
+}
+
+impl ProjectBranch {
+    pub fn new(head: String) -> Self {
+        ProjectBranch { head, merges: None }
+    }
+}
+
+/// [`check`] with the shared cache.
+pub(crate) async fn check_cached(
+    client: &GitLabClient,
+    project: &str,
+    label: &str,
+    pb: &mut ProjectBranch,
+    source_branch: &str,
+    head: &str,
+) -> AppResult<Option<OnBranch>> {
+    let key = (
+        label.to_string(),
+        project.to_string(),
+        head.to_string(),
+        pb.head.clone(),
+    );
+    if let Some(s) = CACHE.lock().ok().and_then(|c| c.get(&key).cloned()) {
+        return Ok(s);
+    }
+    let s = check(client, project, label, pb, source_branch, head).await?;
+    if let Ok(mut c) = CACHE.lock() {
+        if c.len() >= CACHE_MAX {
+            c.clear();
+        }
+        c.insert(key, s.clone());
+    }
+    Ok(s)
 }
 
 /// Keeps the MRs that are on `branch` and sets their [`OnBranch`]. With `keep_all`, every
@@ -145,10 +181,7 @@ pub async fn filter_on_branch(
                     .and_then(Value::as_str)
                     .map(str::to_string)
             });
-            projects.insert(
-                project.clone(),
-                head.map(|head| ProjectBranch { head, merges: None }),
-            );
+            projects.insert(project.clone(), head.map(ProjectBranch::new));
         }
         let Some(Some(pb)) = projects.get_mut(&project) else {
             if keep_all {
@@ -157,28 +190,15 @@ pub async fn filter_on_branch(
             continue;
         };
 
-        let key = (project.clone(), mr.head_sha.clone(), pb.head.clone());
-        let cached = CACHE.lock().ok().and_then(|c| c.get(&key).cloned());
-        let status = if let Some(s) = cached {
-            s
-        } else {
-            let s = check(
-                client,
-                &project,
-                branch,
-                pb,
-                &mr.source_branch,
-                &mr.head_sha,
-            )
-            .await?;
-            if let Ok(mut c) = CACHE.lock() {
-                if c.len() >= CACHE_MAX {
-                    c.clear();
-                }
-                c.insert(key, s.clone());
-            }
-            s
-        };
+        let status = check_cached(
+            client,
+            &project,
+            branch,
+            pb,
+            &mr.source_branch,
+            &mr.head_sha,
+        )
+        .await?;
         let on = status.is_some();
         if let Some(m) = item.mr.as_mut() {
             m.on_branch = status;
@@ -192,6 +212,8 @@ pub async fn filter_on_branch(
     Ok((out, warning))
 }
 
+/// `branch` is only the label of the result; history is read from `pb.head`, so the same
+/// check works for a deployed commit that is no longer a branch head (FR-040).
 async fn check(
     client: &GitLabClient,
     project: &str,
@@ -204,7 +226,7 @@ async fn check(
         let path = format!(
             "projects/{}/repository/commits?ref_name={}&first_parent=true&per_page={MERGE_HISTORY}",
             enc(project),
-            enc(branch)
+            enc(&pb.head)
         );
         pb.merges = Some(
             get_opt(client, &path)

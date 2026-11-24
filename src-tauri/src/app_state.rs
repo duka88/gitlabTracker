@@ -11,8 +11,8 @@ use tauri::{AppHandle, Emitter, Manager};
 use crate::engine::diff::{menu_count, tab_badge};
 use crate::error::Issue;
 use crate::model::{
-    AppView, MAX_TAB_NAME, NotificationLog, PersistedState, Settings, Tab, TabState, TabView,
-    url_fingerprint,
+    AppView, EnvStatus, MAX_TAB_NAME, NotificationLog, PersistedState, Settings, Tab, TabState,
+    TabView, url_fingerprint,
 };
 use crate::store;
 use crate::url_map::parse_tab_url;
@@ -150,6 +150,19 @@ impl Core {
             interval_minutes: self.settings.interval_minutes,
             notify_mentions: self.settings.notify_mentions,
             test_branch: self.settings.test_branch.clone(),
+            tracked_envs: self.settings.tracked_envs.clone(),
+            envs: self
+                .settings
+                .tracked_envs
+                .iter()
+                .map(|e| {
+                    self.state
+                        .envs
+                        .get(&e.key())
+                        .cloned()
+                        .unwrap_or_else(|| EnvStatus::empty(e.clone()))
+                })
+                .collect(),
             polling: self.polling,
             last_poll_at: self.last_poll_at,
             active_tab_id: self.active_tab(),

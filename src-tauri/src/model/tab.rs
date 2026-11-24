@@ -56,6 +56,9 @@ pub enum TabSort {
     /// `state::` label in workflow order (In Development → Ready for Testing → In Testing →
     /// Ready to Merge); ties by priority.
     Stage,
+    /// MR approval: approved first, then fewest approvals still needed, then most given;
+    /// rows without approval data (work items) last.
+    Approval,
 }
 
 fn yes() -> bool {

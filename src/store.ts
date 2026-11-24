@@ -16,6 +16,8 @@ interface State {
   /** Row to scroll to and highlight for 2 s. */
   highlight: (RowTarget & { until: number }) | null;
   visible: boolean;
+  /** The Envs tab is shown instead of a list tab (FR-040). */
+  envsOpen: boolean;
 }
 
 const state = reactive<State>({
@@ -26,6 +28,7 @@ const state = reactive<State>({
   bellEntries: [],
   highlight: null,
   visible: true,
+  envsOpen: false,
 });
 
 let started = false;
@@ -46,6 +49,7 @@ function activeTabId(): string | null {
 }
 
 async function selectTab(tabId: string) {
+  state.envsOpen = false;
   if (state.view) state.view.activeTabId = tabId;
   await api.selectTab(tabId);
   void events.emitVisibility(state.visible, tabId);
@@ -135,6 +139,9 @@ export function useAppState() {
     },
     closeSettings: () => {
       if (state.view?.signedIn) state.screen = "tabs";
+    },
+    openEnvs: () => {
+      state.envsOpen = true;
     },
     openUrl: (url: string) => api.openUrl(url),
     hide: () => {

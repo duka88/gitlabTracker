@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use super::env::{TrackedEnv, default_tracked_envs, normalize_envs};
 use super::tab::{Tab, default_tabs};
 
 pub const ALLOWED_INTERVALS: [u8; 4] = [1, 2, 5, 10];
@@ -15,6 +16,8 @@ pub struct Settings {
     pub tabs: Vec<Tab>,
     /// Branch flagged on every MR in every MR tab (FR-037), e.g. `resource-test`.
     pub test_branch: Option<String>,
+    /// Deployment environments shown in the Envs tab and as row chips (FR-040).
+    pub tracked_envs: Vec<TrackedEnv>,
 }
 
 impl Default for Settings {
@@ -26,6 +29,7 @@ impl Default for Settings {
             user: None,
             tabs: default_tabs(),
             test_branch: None,
+            tracked_envs: default_tracked_envs(),
         }
     }
 }
@@ -37,6 +41,8 @@ impl Settings {
             self.interval_minutes = 2;
         }
         self.test_branch = normalize_branch(self.test_branch.take());
+        self.tracked_envs = normalize_envs(std::mem::take(&mut self.tracked_envs))
+            .unwrap_or_else(|_| default_tracked_envs());
         for tab in &mut self.tabs {
             if tab.id.is_empty() {
                 tab.id = uuid::Uuid::new_v4().to_string();

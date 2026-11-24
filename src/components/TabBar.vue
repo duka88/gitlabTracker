@@ -4,7 +4,7 @@ import { useAppState } from "../store";
 import Icon from "./Icon.vue";
 import BellPopup from "./BellPopup.vue";
 
-const { state, activeTabId, selectTab, refresh, openSettings, openBell, closeBell, hide } = useAppState();
+const { state, activeTabId, selectTab, refresh, openSettings, openBell, closeBell, hide, openEnvs } = useAppState();
 
 function toggleBell() {
   if (state.bellOpen) closeBell();
@@ -20,14 +20,26 @@ function toggleBell() {
         :key="t.tab.id"
         class="tab"
         role="tab"
-        :aria-selected="t.tab.id === activeTabId"
-        :class="{ active: t.tab.id === activeTabId, errored: !!t.error }"
+        :aria-selected="!state.envsOpen && t.tab.id === activeTabId"
+        :class="{ active: !state.envsOpen && t.tab.id === activeTabId, errored: !!t.error }"
         :title="t.tab.name"
         @click="selectTab(t.tab.id)"
       >
         <span class="name">{{ t.tab.name }}</span>
         <span class="cnt">{{ t.loaded ? t.itemCount : "–" }}</span>
         <span v-if="t.newCount > 0" class="badge" :aria-label="`${t.newCount} new`">{{ t.newCount }}</span>
+      </button>
+      <button
+        v-if="state.view?.envs.length"
+        class="tab"
+        role="tab"
+        :aria-selected="state.envsOpen"
+        :class="{ active: state.envsOpen, errored: state.view.envs.some((e) => !!e.error) }"
+        title="What's deployed on the tracked environments"
+        @click="openEnvs"
+      >
+        <span class="name">Envs</span>
+        <span class="cnt">{{ state.view.envs.length }}</span>
       </button>
     </nav>
     <div class="actions">

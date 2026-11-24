@@ -13,8 +13,9 @@ The webview never talks to GitLab and never sees the token (constitution II/III)
 | `set_interval` | `{ minutes: 1\|2\|5\|10 }` | `()` | Saves the value and restarts the timer. |
 | `set_notify_mentions` | `{ enabled: boolean }` | `()` | |
 | `set_test_branch` | `{ branch: string \| null }` | `()` | Global branch flagged on every MR (FR-037). Trimmed; empty/`null` turns it off; whitespace inside → `Invalid`. Saves, emits `state://updated` and triggers a poll. |
+| `set_tracked_envs` | `{ envs: { project: string, name: string }[] }` | `TrackedEnv[]` | Replaces the tracked deployment envs (FR-040). Normalized as in data-model `normalize_envs`; a half-filled row or whitespace → `Invalid`. Drops stored status of removed envs, saves, emits `state://updated` and triggers a poll. Returns the normalized list. |
 | `validate_url` | `{ url: string }` | `UrlCheck` | Pure parse, no network. `UrlCheck = { valid, kind?, scopeLabel?, filtersSummary?: string[], ignoredParams: string[], error?: string }` (FR-013). |
-| `save_tabs` | `{ tabs: Tab[] }` | `Tab[]` | Replaces the whole ordered list (add, rename, reorder, delete, toggles). Ids are added to new tabs. Every URL must be valid. Tabs whose URL or `testBranch` changed get their state reset. `Tab.testBranch?: string \| null` (MR tabs only, trimmed, no whitespace, dropped on work-item tabs, FR-034). `Tab.groupByWeek?: boolean` (work-item tabs only, dropped on MR tabs; doesn't reset state, FR-038). `Tab.sort?: "gitlab" \| "label" \| "updated" \| "created" \| "title" \| "priority" \| "stage"` (default row order, default `gitlab`; doesn't reset state, FR-039). Triggers a poll. |
+| `save_tabs` | `{ tabs: Tab[] }` | `Tab[]` | Replaces the whole ordered list (add, rename, reorder, delete, toggles). Ids are added to new tabs. Every URL must be valid. Tabs whose URL or `testBranch` changed get their state reset. `Tab.testBranch?: string \| null` (MR tabs only, trimmed, no whitespace, dropped on work-item tabs, FR-034). `Tab.groupByWeek?: boolean` (work-item tabs only, dropped on MR tabs; doesn't reset state, FR-038). `Tab.sort?: "gitlab" \| "label" \| "updated" \| "created" \| "title" \| "priority" \| "stage" \| "approval"` (default row order, default `gitlab`; doesn't reset state, FR-039). Triggers a poll. |
 | `reset_default_tabs` | — | `Tab[]` | Restores the 6 defaults (R14). |
 | `refresh_now` | — | `()` | Starts a poll, or does nothing if one is running (FR-018). |
 | `select_tab` | `{ tabId: string }` | `()` | Sets `active_tab_id` and clears that tab's markers (FR-023). |
@@ -61,3 +62,10 @@ The webview never talks to GitLab and never sees the token (constitution II/III)
 - `AppView.testBranch: string | null` (FR-037).
 - `ListItem.closedAt?: string | null` (work items, FR-038).
 - `MrFields` adds `unresolvedThreads: number` (FR-025b), `sourceBranch`, `headSha`, `onBranch: { branch, upToDate, mergedAt } | null` (FR-034/FR-037), and `ticket: { reference, title, webUrl, open, stateLabel: Label | null, status: { name, color } | null } | null` (FR-036). `MergeStatusTag` adds `"approved"`. `approvals.approved` and `approvals.given` follow FR-025a.
+
+## View fields added 2026-11-24 (FR-040)
+
+- `AppView.trackedEnvs: { project, name }[]` and `AppView.envs: EnvStatus[]` (one per tracked env, in Settings order): `{ env, webUrl, state, deployment: { id, ref, sha, finishedAt, user, jobUrl } | null, error, checkedAt }`.
+- `ListItem.envs?: { env, upToDate }[]`.
+- `NotificationKind` adds `"deploy"` (no `itemGid`; `webUrl` is the deploy job, opened in the browser).
+

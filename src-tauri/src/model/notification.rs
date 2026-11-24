@@ -11,6 +11,8 @@ pub enum NotificationKind {
     Comment,
     Change,
     Mention,
+    /// New deployment on a tracked env (FR-040).
+    Deploy,
 }
 
 /// One bell entry (persisted in `notifications.json`, newest 100).

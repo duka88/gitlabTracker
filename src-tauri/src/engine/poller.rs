@@ -12,12 +12,14 @@ use tauri::{AppHandle, Emitter};
 use tokio::sync::{Notify, watch};
 use tokio::time::MissedTickBehavior;
 
+use super::env_watch::apply_env_statuses;
 use super::notifier::{Notifier, deliver};
 use super::poll::{PollRun, recompute_counts};
 use crate::app_state::{Shared, emit_view};
 use crate::error::{AppError, Issue};
 use crate::gitlab::GitLabClient;
 use crate::gitlab::branch_check::filter_on_branch;
+use crate::gitlab::envs::{fetch_env, flag_envs};
 use crate::gitlab::lists::{FetchResult, fetch_tab};
 use crate::gitlab::mentions::fetch_mentions;
 use crate::gitlab::merged::check_merged;
@@ -130,7 +132,7 @@ pub async fn run_poll(
     notifier: &dyn Notifier,
 ) {
     let _ = app.emit("poll://started", ());
-    let (token, tabs, me, visible, notify_mentions, global_branch) = {
+    let (token, tabs, me, visible, notify_mentions, global_branch, tracked_envs) = {
         let mut c = core.lock().await;
         c.polling = true;
         (
@@ -140,6 +142,7 @@ pub async fn run_poll(
             c.visible_tab(),
             c.settings.notify_mentions,
             c.settings.test_branch.clone(),
+            c.settings.tracked_envs.clone(),
         )
     };
     let Some(token) = token else {
@@ -194,7 +197,23 @@ pub async fn run_poll(
     let tabs_fut = futures::stream::iter(tab_futs)
         .buffer_unordered(MAX_CONCURRENT_TABS)
         .collect::<Vec<(String, Result<FetchResult, AppError>)>>();
-    let (mentions, fetched) = tokio::join!(mentions_fut, tabs_fut);
+    // Tracked envs (FR-040), alongside the tabs.
+    let started = Utc::now();
+    let envs_fut =
+        futures::future::join_all(tracked_envs.iter().map(|e| fetch_env(&client, e, started)));
+    let (mentions, mut fetched, env_statuses) = tokio::join!(mentions_fut, tabs_fut, envs_fut);
+
+    // Env chips on rows, across all tabs (a ticket gets its MRs' envs).
+    {
+        let mut rows: Vec<&mut crate::model::ListItem> = fetched
+            .iter_mut()
+            .filter_map(|(_, r)| r.as_mut().ok())
+            .flat_map(|r| r.items.iter_mut())
+            .collect();
+        if let Err(e) = flag_envs(&client, &mut rows, &env_statuses).await {
+            eprintln!("[gitlab-tracker] env check failed: {e}");
+        }
+    }
 
     // A global error (token rejected, offline) shows once, above the tabs (FR-031).
     let mut global: Option<Issue> = fetched
@@ -215,6 +234,11 @@ pub async fn run_poll(
         };
         let (n, follow) = run.apply_tabs(&mut c.state, fetched);
         pending.extend(n);
+        pending.extend(apply_env_statuses(
+            &mut c.state.envs,
+            &tracked_envs,
+            env_statuses,
+        ));
         (pending, follow)
     };
 

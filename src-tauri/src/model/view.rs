@@ -5,6 +5,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 
+use super::env::{EnvStatus, TrackedEnv};
 use super::item::ListItem;
 use super::settings::UserInfo;
 use super::state::ChangeKind;
@@ -19,6 +20,9 @@ pub struct AppView {
     pub interval_minutes: u8,
     pub notify_mentions: bool,
     pub test_branch: Option<String>,
+    pub tracked_envs: Vec<TrackedEnv>,
+    /// One per tracked env, in Settings order.
+    pub envs: Vec<EnvStatus>,
     pub polling: bool,
     pub last_poll_at: Option<DateTime<Utc>>,
     pub active_tab_id: Option<String>,

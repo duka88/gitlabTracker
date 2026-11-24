@@ -3,6 +3,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
+use super::env::EnvStatus;
 use super::item::{ListItem, PipelineStatus};
 use super::tab::ListKind;
 use crate::error::Issue;
@@ -227,4 +228,7 @@ pub struct PersistedState {
     pub schema_version: u32,
     pub global: GlobalState,
     pub tabs: HashMap<String, TabState>,
+    /// Last known deployment per tracked env, keyed by [`super::TrackedEnv::key`] (FR-040).
+    /// Also the baseline for "new deployment" notifications.
+    pub envs: HashMap<String, EnvStatus>,
 }

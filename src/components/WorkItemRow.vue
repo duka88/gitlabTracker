@@ -8,6 +8,7 @@ import AvatarStack from "./AvatarStack.vue";
 import TypeIcon from "./TypeIcon.vue";
 import StatusDot from "./StatusDot.vue";
 import Icon from "./Icon.vue";
+import EnvChips from "./EnvChips.vue";
 import { formatDateTime, formatDueDate, isOverdue, relativeTime } from "../util/time";
 
 const props = defineProps<{ item: ListItem; tabView: TabView; now: number }>();
@@ -63,8 +64,9 @@ const HEALTH: Record<Health, { text: string; cls: string }> = {
         </div>
       </div>
       <div class="side">
-        <div v-if="changeText" class="side-line">
-          <span class="tag changed" :title="`Changed: ${changeText}`">{{ changeText }}</span>
+        <div v-if="changeText || item.envs?.length" class="side-line">
+          <span v-if="changeText" class="tag changed" :title="`Changed: ${changeText}`">{{ changeText }}</span>
+          <EnvChips :envs="item.envs" />
         </div>
         <div class="side-line">
           <span v-if="wi.health" class="health" :class="HEALTH[wi.health].cls">{{ HEALTH[wi.health].text }}</span>

@@ -14,8 +14,8 @@ use crate::error::{AppError, AppResult};
 use crate::gitlab::GitLabClient;
 use crate::gitlab::user::fetch_current_user;
 use crate::model::{
-    ALLOWED_INTERVALS, AppView, NotificationEntry, NotificationKind, OpenTarget, Tab, UrlCheck,
-    UserInfo, default_tabs,
+    ALLOWED_INTERVALS, AppView, NotificationEntry, NotificationKind, OpenTarget, Tab, TrackedEnv,
+    UrlCheck, UserInfo, default_tabs, normalize_envs,
 };
 use crate::secrets;
 use crate::url_map::check_url;
@@ -124,6 +124,27 @@ pub async fn set_test_branch(
     }
     ctx.poller.refresh();
     Ok(())
+}
+
+/// Sets the deployment environments to track (FR-040) and starts a poll.
+#[tauri::command]
+pub async fn set_tracked_envs(
+    app: AppHandle,
+    ctx: State<'_, AppCtx>,
+    envs: Vec<TrackedEnv>,
+) -> AppResult<Vec<TrackedEnv>> {
+    let envs = normalize_envs(envs).map_err(AppError::Invalid)?;
+    {
+        let mut c = ctx.core.lock().await;
+        c.settings.tracked_envs.clone_from(&envs);
+        let keys: Vec<String> = envs.iter().map(TrackedEnv::key).collect();
+        c.state.envs.retain(|k, _| keys.contains(k));
+        c.save_settings();
+        c.save_state();
+        emit_view(&app, &c);
+    }
+    ctx.poller.refresh();
+    Ok(envs)
 }
 
 #[tauri::command]

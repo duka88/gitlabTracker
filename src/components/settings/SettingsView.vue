@@ -8,6 +8,7 @@ import IssueBar from "../IssueBar.vue";
 import TokenForm from "./TokenForm.vue";
 import IntervalPicker from "./IntervalPicker.vue";
 import TabEditor from "./TabEditor.vue";
+import EnvEditor from "./EnvEditor.vue";
 
 const { state, closeSettings, quit, hide } = useAppState();
 const mentionError = ref<string | null>(null);
@@ -78,6 +79,7 @@ async function setMentions(e: Event) {
         <p v-if="branchSaved" class="saved small">Saved</p>
         <p v-if="branchError" class="err" role="alert">{{ branchError }}</p>
       </section>
+      <EnvEditor />
       <TabEditor />
     </div>
   </div>

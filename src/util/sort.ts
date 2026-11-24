@@ -5,6 +5,7 @@ export const SORT_OPTIONS: { value: TabSort; label: string }[] = [
   { value: "gitlab", label: "GitLab order" },
   { value: "priority", label: "Priority" },
   { value: "stage", label: "Stage (dev → testing)" },
+  { value: "approval", label: "Approval (approved first)" },
   { value: "label", label: "Label" },
   { value: "updated", label: "Last updated" },
   { value: "created", label: "Created" },
@@ -56,6 +57,15 @@ function compareStage(a: string | null, b: string | null): number {
   return rank(a) - rank(b) || collator.compare(a, b);
 }
 
+/** Approved first, then fewest approvals still needed, then most given; no MR data last. */
+function compareApproval(a: ListItem, b: ListItem): number {
+  const x = a.mr?.approvals;
+  const y = b.mr?.approvals;
+  if (!x || !y) return Number(!x) - Number(!y);
+  const left = (p: typeof x) => Math.max(p.required - p.given, 0);
+  return Number(y.approved) - Number(x.approved) || left(x) - left(y) || y.given - x.given;
+}
+
 const time = (iso: string) => {
   const t = Date.parse(iso);
   return Number.isNaN(t) ? -Infinity : t;
@@ -80,6 +90,8 @@ export function sortItems(items: readonly ListItem[], sort: TabSort | undefined)
       return [...items].sort(
         (a, b) => compareStage(stageOf(a), stageOf(b)) || comparePriority(priorityOf(a), priorityOf(b)),
       );
+    case "approval":
+      return [...items].sort(compareApproval);
     case "title":
       return [...items].sort((a, b) => collator.compare(a.title, b.title));
     default:

@@ -124,6 +124,7 @@ pub fn run() {
             commands::set_interval,
             commands::set_notify_mentions,
             commands::set_test_branch,
+            commands::set_tracked_envs,
             commands::validate_url,
             commands::save_tabs,
             commands::reset_default_tabs,

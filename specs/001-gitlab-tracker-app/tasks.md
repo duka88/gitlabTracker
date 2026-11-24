@@ -310,6 +310,7 @@ claude
 - [X] T133 Add the Envs tab (env cards with ref, commit → deploy job, deployer, time, rows on it → jump to row), env chips on MR and work-item rows, and the Settings "Environments" editor (FR-040), in src/types.ts, src/ipc.ts, src/store.ts, src/App.vue, src/components/TabBar.vue, src/components/EnvList.vue, src/components/EnvChips.vue, src/components/MrRow.vue, src/components/WorkItemRow.vue, src/components/settings/EnvEditor.vue and src/components/settings/SettingsView.vue
 - [X] T134 Print tracked envs (plus `EXTRA_ENVS`) and the rows on them in the live check; checked against gitlab.com: qa-1 = `resource-test`, 13 of the user's MRs on it (2 outdated) (FR-040), in src-tauri/examples/live_check.rs
 - [ ] T135 Run the Independent Test above on the dev build, including a deploy notification
+- [X] T136 Add "Not approved" and "Not deployed" filter checkboxes to the list toolbar, per tab until restart, with "N of M" and an empty-filter message; pure `filterItems` with tests (FR-041), in src/util/filter.ts, src/util/__tests__/filter.test.ts and src/components/TabList.vue
 
 ---
 

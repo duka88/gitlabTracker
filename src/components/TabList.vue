@@ -1,9 +1,12 @@
 <script lang="ts">
 import { reactive as moduleReactive } from "vue";
 import type { TabSort } from "../types";
+import type { RowFilters } from "../util/filter";
 // Sort picked in the list view, per tab, until restart. Dropped when the tab's default
 // (Settings) changes, so the new default takes over.
 const chosenSort = moduleReactive(new Map<string, { base: TabSort; sort: TabSort }>());
+// "Not approved" / "Not deployed" checkboxes, per tab, until restart.
+const chosenFilters = moduleReactive(new Map<string, RowFilters>());
 </script>
 
 <script setup lang="ts">
@@ -16,6 +19,7 @@ import WorkItemRow from "./WorkItemRow.vue";
 import IssueBar from "./IssueBar.vue";
 import { groupByMonthWeek, monthsBack, periodKeys } from "../util/groups";
 import { SORT_OPTIONS, sortItems } from "../util/sort";
+import { NO_FILTERS, filterItems } from "../util/filter";
 
 const { state, activeTab } = useAppState();
 const now = useNow();
@@ -34,7 +38,15 @@ const sort = computed<TabSort>({
     if (activeTab.value) chosenSort.set(activeTab.value.tab.id, { base: baseSort.value, sort: v });
   },
 });
-const items = computed(() => sortItems(activeTab.value?.items ?? [], sort.value));
+const filters = computed<RowFilters>(() => chosenFilters.get(activeTab.value?.tab.id ?? "") ?? NO_FILTERS);
+function setFilter(key: keyof RowFilters, e: Event) {
+  if (!activeTab.value) return;
+  chosenFilters.set(activeTab.value.tab.id, { ...filters.value, [key]: (e.target as HTMLInputElement).checked });
+}
+const isMrTab = computed(() => activeTab.value?.tab.kind === "mergeRequests");
+const hasEnvs = computed(() => (state.view?.trackedEnvs.length ?? 0) > 0);
+const filtering = computed(() => filters.value.notApproved || filters.value.notDeployed);
+const items = computed(() => sortItems(filterItems(activeTab.value?.items ?? [], filters.value), sort.value));
 
 const MONTH_STEP = 12;
 const groups = computed(() => (activeTab.value?.tab.groupByWeek ? groupByMonthWeek(items.value) : null));
@@ -96,6 +108,16 @@ watch(
       <IssueBar v-if="activeTab.error" :issue="activeTab.error" />
       <IssueBar v-if="activeTab.warning" :issue="activeTab.warning" warning />
       <div v-if="activeTab.items.length > 0" class="toolbar">
+        <label v-if="isMrTab" class="check" title="Only MRs that aren't approved yet">
+          <input type="checkbox" :checked="filters.notApproved" @change="setFilter('notApproved', $event)" />
+          Not approved
+        </label>
+        <label v-if="hasEnvs" class="check" title="Only rows not deployed on any tracked environment (outdated counts as not deployed)">
+          <input type="checkbox" :checked="filters.notDeployed" @change="setFilter('notDeployed', $event)" />
+          Not deployed
+        </label>
+        <span v-if="filtering" class="shown">{{ items.length }} of {{ activeTab.items.length }}</span>
+        <span class="grow" />
         <label for="tab-sort">Sort</label>
         <select id="tab-sort" v-model="sort">
           <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value">{{ o.label }}</option>
@@ -106,6 +128,7 @@ watch(
         <div v-else-if="activeTab.items.length === 0" class="empty">
           {{ activeTab.error ? "Nothing to show" : "Nothing here — this list is empty in GitLab" }}
         </div>
+        <div v-else-if="items.length === 0" class="empty">Nothing matches the filters</div>
         <template v-else-if="groups">
           <section v-for="m in visibleGroups" :key="m.key" class="month">
             <button class="group-head month-head" :aria-expanded="!isCollapsed(m.key)" @click="toggle(m.key)">
@@ -158,6 +181,22 @@ watch(
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-sm);
   color: var(--text-muted);
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.check input {
+  margin: 0;
+}
+.shown {
+  font-size: var(--fs-xs);
+}
+.grow {
+  flex: 1;
 }
 .toolbar select {
   font: inherit;
